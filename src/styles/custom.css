@@ -40,6 +40,11 @@
 
   /* Links */
   --sl-color-text-link: #c0c0c0;
+
+  /* Layout - maximize content width */
+  --sl-content-width: 75rem;
+  --sl-sidebar-width: 14rem;
+  --sl-content-pad-x: 1rem;
 }
 
 /* Force dark mode */
@@ -179,7 +184,7 @@ nav a[aria-current="page"] {
 /* Sidebar item font */
 nav.sidebar a,
 nav.sidebar span {
-  font-size: 0.8rem !important;
+  font-size: 1rem !important;
 }
 
 /* Sidebar group labels */

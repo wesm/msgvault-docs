@@ -18,7 +18,9 @@ const shouldRenderSearch =
 		{shouldRenderSearch && <Search />}
 	</div>
 	<div class="sl-hidden md:sl-flex print:hidden right-group">
-		<a href="https://github.com/wesm/msgvault" class="github-link" target="_blank" rel="noopener noreferrer">GitHub</a>
+		<a href="https://github.com/wesm/msgvault" class="github-stars-badge" target="_blank" rel="noopener noreferrer">
+			<img src="https://img.shields.io/github/stars/wesm/msgvault?style=social" alt="GitHub stars" />
+		</a>
 		<ThemeSelect />
 		<LanguageSelect />
 	</div>
@@ -44,16 +46,13 @@ const shouldRenderSearch =
 		align-items: center;
 	}
 
-	.github-link {
-		font-family: var(--sl-font-mono);
-		font-size: 0.8rem;
-		color: var(--sl-color-gray-2);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
+	.github-stars-badge {
+		display: flex;
+		align-items: center;
 	}
 
-	.github-link:hover {
-		color: #ffffff !important;
+	.github-stars-badge img {
+		height: 28px;
 	}
 
 	@media (min-width: 50rem) {
