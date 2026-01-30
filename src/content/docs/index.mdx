@@ -1,0 +1,59 @@
+---
+title: msgvault
+description: Offline Gmail archive with full-text search, interactive TUI, and multi-account support.
+template: splash
+hero:
+  tagline: Archive years of Gmail offline. Search everything. Delete with confidence.
+  actions:
+    - text: Quick Start
+      link: /quickstart/
+      icon: right-arrow
+    - text: GitHub
+      link: https://github.com/wesm/msgvault
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Features
+
+<CardGrid>
+  <Card title="Full Gmail Backup" icon="document">
+    Downloads complete messages including raw MIME, attachments, labels, and metadata.
+  </Card>
+  <Card title="Interactive TUI" icon="laptop">
+    Terminal interface for exploring your archive — drill down by sender, domain, label, or time period. Powered by DuckDB over Parquet.
+  </Card>
+  <Card title="Full-Text Search" icon="magnifier">
+    SQLite FTS5-powered search with Gmail-like query syntax. Search by sender, date, label, size, attachments, and more.
+  </Card>
+  <Card title="Multi-Account" icon="add-document">
+    Archive multiple Gmail accounts in a single database with cross-account search.
+  </Card>
+  <Card title="Incremental Sync" icon="rocket">
+    Uses Gmail History API for efficient updates after initial full sync. Resumable checkpoints for interrupted syncs.
+  </Card>
+  <Card title="Safe Deletion" icon="warning">
+    Stage messages for deletion in the TUI, review manifests, then trash or permanently delete from Gmail.
+  </Card>
+</CardGrid>
+
+## How It Works
+
+```
+Gmail API  →  sync-full / sync-incremental  →  SQLite (system of record)
+                                                    ↓
+                                              Parquet cache (analytics)
+                                                    ↓
+                                              Interactive TUI / Search
+```
+
+## Install
+
+```bash
+git clone https://github.com/wesm/msgvault.git
+cd msgvault && make install
+```
+
+Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/quickstart/).

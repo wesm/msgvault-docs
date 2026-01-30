@@ -1,0 +1,138 @@
+---
+title: Database Schema
+description: SQLite tables, relationships, and FTS5 virtual table.
+---
+
+## Core Tables
+
+### sources
+
+Gmail accounts with sync state.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `source_type` | TEXT | `gmail` |
+| `identifier` | TEXT | Email address |
+| `display_name` | TEXT | Account display name |
+| `sync_cursor` | TEXT | Gmail history ID for incremental sync |
+| `last_sync_at` | DATETIME | Last sync timestamp |
+
+### conversations
+
+Gmail thread abstraction.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `source_id` | INTEGER FK | References `sources` |
+| `source_conversation_id` | TEXT | Gmail thread ID |
+| `conversation_type` | TEXT | `email_thread` |
+| `message_count` | INTEGER | Denormalized count |
+| `last_message_at` | DATETIME | Latest message timestamp |
+
+### messages
+
+Message metadata. Foreign key to `conversations`.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `conversation_id` | INTEGER FK | References `conversations` |
+| `source_id` | INTEGER FK | References `sources` |
+| `source_message_id` | TEXT | Gmail message ID |
+| `message_type` | TEXT | `email` |
+| `sent_at` | DATETIME | Send timestamp |
+| `sender_id` | INTEGER FK | References `participants` |
+| `subject` | TEXT | Email subject |
+| `body_text` | TEXT | Plain text content |
+| `snippet` | TEXT | Preview excerpt |
+| `size_estimate` | INTEGER | Approximate size in bytes |
+| `has_attachments` | BOOLEAN | Attachment flag |
+| `deleted_at` | DATETIME | Soft delete timestamp |
+
+### message_raw
+
+Raw MIME blob storage.
+
+| Column | Type | Description |
+|---|---|---|
+| `message_id` | INTEGER PK/FK | References `messages` |
+| `raw_data` | BLOB | Compressed MIME data |
+| `compression` | TEXT | `zlib` |
+
+### participants
+
+Unified contacts.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `email_address` | TEXT | Email address (unique index) |
+| `display_name` | TEXT | Contact name |
+| `domain` | TEXT | Extracted domain |
+
+### message_recipients
+
+From/To/Cc/Bcc mapping.
+
+| Column | Type | Description |
+|---|---|---|
+| `message_id` | INTEGER FK | References `messages` |
+| `participant_id` | INTEGER FK | References `participants` |
+| `recipient_type` | TEXT | `to`, `cc`, `bcc` |
+
+### labels / message_labels
+
+Gmail labels (many-to-many).
+
+| Table | Key Columns |
+|---|---|
+| `labels` | `id`, `source_id`, `source_label_id`, `name`, `label_type` |
+| `message_labels` | `message_id`, `label_id` |
+
+### attachments
+
+Content-addressed attachment metadata.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `message_id` | INTEGER FK | References `messages` |
+| `filename` | TEXT | Original filename |
+| `mime_type` | TEXT | MIME type |
+| `size` | INTEGER | Size in bytes |
+| `content_hash` | TEXT | SHA-256 hash |
+| `storage_path` | TEXT | Relative path: `ab/abcd1234...` |
+
+### sync_runs / sync_checkpoints
+
+Sync state for resumability.
+
+| Table | Purpose |
+|---|---|
+| `sync_runs` | Track each sync operation (start, end, counts, errors) |
+| `sync_checkpoints` | Resume point per source (message ID, page token) |
+
+## FTS5 Virtual Table
+
+```sql
+CREATE VIRTUAL TABLE messages_fts USING fts5(
+    subject,
+    body_text,
+    content='messages',
+    content_rowid='id'
+);
+```
+
+Powers full-text search via `msgvault search`. Indexed on `subject` and `body_text` columns.
+
+## Relationships
+
+```
+sources ─┬─< conversations ─< messages ─┬─< message_recipients ─> participants
+         │                               ├─< message_labels ─> labels
+         │                               ├── message_raw
+         │                               └─< attachments
+         └─< labels
+```

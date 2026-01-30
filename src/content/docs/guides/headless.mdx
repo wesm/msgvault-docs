@@ -1,0 +1,48 @@
+---
+title: Headless Server Setup
+description: Device authorization flow for servers without a browser.
+---
+
+## Use Case
+
+When running msgvault on a headless server (SSH, VPS, Docker), there's no browser available for the standard OAuth flow. Use the device authorization flow instead.
+
+## Device Authorization Flow
+
+```bash
+msgvault add-account you@gmail.com --headless
+```
+
+This displays instructions:
+
+```
+Starting device code flow...
+
+1. Open this URL in any browser:
+   https://www.google.com/device
+
+2. Enter this code when prompted:
+   ABC-XYZ
+
+Waiting for authorization...
+```
+
+## Steps
+
+1. Run `msgvault add-account you@gmail.com --headless` on the server
+2. Open `https://www.google.com/device` on any device with a browser (phone, laptop)
+3. Sign in to your Google account
+4. Enter the displayed code
+5. Grant access to msgvault
+6. The server automatically detects authorization and stores the token
+
+## After Authorization
+
+Once authorized, all other commands work normally:
+
+```bash
+msgvault sync-full you@gmail.com
+msgvault tui
+```
+
+Tokens are stored in `~/.msgvault/tokens/you@gmail.com.json` and refreshed automatically.

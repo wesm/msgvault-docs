@@ -1,0 +1,196 @@
+---
+title: CLI Reference
+description: Complete command reference for all msgvault commands.
+---
+
+## Global Flags
+
+| Flag | Description |
+|---|---|
+| `--config` | Path to config file (default: `~/.msgvault/config.toml`) |
+| `--help` | Show help |
+
+---
+
+## init-db
+
+Initialize the SQLite database.
+
+```bash
+msgvault init-db
+```
+
+---
+
+## add-account
+
+Add a Gmail account and authorize via OAuth.
+
+```bash
+msgvault add-account <email>
+msgvault add-account <email> --headless
+```
+
+| Flag | Description |
+|---|---|
+| `--headless` | Use device authorization flow (no browser) |
+
+---
+
+## sync-full
+
+Download all messages from a Gmail account.
+
+```bash
+msgvault sync-full <email> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--limit N` | Maximum messages to download |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--noresume` | Ignore checkpoints, start fresh |
+| `--verbose` | Detailed progress output |
+
+---
+
+## sync-incremental
+
+Fetch only new and changed messages using Gmail History API.
+
+```bash
+msgvault sync-incremental <email>
+```
+
+---
+
+## search
+
+Search the archive with Gmail-like query syntax.
+
+```bash
+msgvault search <query> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--json` | Output results as JSON |
+
+See [Searching](/usage/searching/) for the full operator reference.
+
+---
+
+## tui
+
+Launch the interactive terminal interface.
+
+```bash
+msgvault tui [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--account <email>` | Filter to a specific account |
+
+---
+
+## export-eml
+
+Export a message as a `.eml` file.
+
+```bash
+msgvault export-eml [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--message-id N` | Internal database message ID |
+| `--gmail-id <hex>` | Gmail message ID |
+| `--output <path>` | Output file (default: stdout) |
+
+---
+
+## verify
+
+Verify local archive integrity against Gmail.
+
+```bash
+msgvault verify <email> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--sample-size N` | Messages to sample (default: 100) |
+
+---
+
+## stats
+
+Show archive statistics.
+
+```bash
+msgvault stats
+```
+
+---
+
+## list-senders
+
+List top senders by message count.
+
+```bash
+msgvault list-senders [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--limit N` | Number of results (default: 10) |
+
+---
+
+## list-domains
+
+List top sender domains by message count.
+
+```bash
+msgvault list-domains [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--limit N` | Number of results (default: 10) |
+
+---
+
+## list-labels
+
+List all labels with message counts.
+
+```bash
+msgvault list-labels
+```
+
+---
+
+## build-cache
+
+Build or update the Parquet analytics cache.
+
+```bash
+msgvault build-cache [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--full-rebuild` | Discard existing cache and rebuild |
+
+---
+
+## repair-encoding
+
+Fix UTF-8 encoding issues in existing messages.
+
+```bash
+msgvault repair-encoding
+```

@@ -1,0 +1,72 @@
+---
+title: Syncing Email
+description: Full sync, incremental sync, date filtering, and resumable checkpoints.
+---
+
+## Full Sync
+
+Downloads all messages from a Gmail account:
+
+```bash
+msgvault sync-full you@gmail.com
+```
+
+### Flags
+
+| Flag | Description |
+|---|---|
+| `--limit N` | Download at most N messages |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--noresume` | Start fresh instead of resuming |
+| `--verbose` | Show detailed progress |
+
+### Examples
+
+```bash
+# Test with 100 messages
+msgvault sync-full you@gmail.com --limit 100
+
+# Sync a specific month
+msgvault sync-full you@gmail.com --after 2024-01-01 --before 2024-02-01
+
+# Sync everything (no limit)
+msgvault sync-full you@gmail.com
+
+# Force fresh start (ignore checkpoints)
+msgvault sync-full you@gmail.com --noresume
+```
+
+## Incremental Sync
+
+After the initial full sync, use incremental sync for efficient updates. It uses the Gmail History API to fetch only new and changed messages:
+
+```bash
+msgvault sync-incremental you@gmail.com
+```
+
+## Resumable Checkpoints
+
+If a sync is interrupted (network error, Ctrl+C), run the same command again — it resumes from the last checkpoint:
+
+```bash
+# This resumes automatically
+msgvault sync-full you@gmail.com --after 2024-01-01 --before 2024-02-01
+```
+
+Checkpoint data is stored in the `sync_checkpoints` table. Use `--noresume` to discard checkpoints and start over.
+
+## Rate Limiting
+
+msgvault uses token bucket rate limiting to respect Gmail API quotas. The default is 5 requests per second, configurable in `config.toml`:
+
+```toml
+[sync]
+rate_limit_qps = 5
+```
+
+Reduce this value if you encounter rate limit errors during large syncs.
+
+## Safety
+
+Sync operations are **read-only**. They use only `messages.list` and `messages.get` Gmail APIs. No write operations are performed — your Gmail data remains untouched.

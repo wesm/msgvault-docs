@@ -1,0 +1,37 @@
+---
+title: Analytics & Stats
+description: Archive statistics, top senders, domains, and labels.
+---
+
+## Stats
+
+Show overall archive statistics:
+
+```bash
+msgvault stats
+```
+
+Displays total message count, account breakdown, date range, storage size, and attachment count.
+
+## List Senders
+
+```bash
+# Top 20 senders
+msgvault list-senders --limit 20
+```
+
+## List Domains
+
+```bash
+# Top 20 sender domains
+msgvault list-domains --limit 20
+```
+
+## List Labels
+
+```bash
+# All labels with message counts
+msgvault list-labels
+```
+
+These commands query the SQLite database directly. For interactive exploration with drill-down, use the [TUI](/usage/tui/).

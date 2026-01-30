@@ -1,0 +1,61 @@
+---
+title: Architecture Overview
+description: Package structure and data flow.
+---
+
+## Package Structure
+
+```
+msgvault/
+├── cmd/msgvault/            # CLI entrypoint
+│   └── cmd/                 # Cobra commands
+├── internal/                # Core packages
+│   ├── tui/                 # Bubble Tea TUI
+│   ├── query/               # DuckDB query engine over Parquet
+│   ├── store/               # SQLite database access
+│   ├── deletion/            # Deletion staging and manifest
+│   ├── gmail/               # Gmail API client
+│   ├── sync/                # Sync orchestration
+│   ├── oauth/               # OAuth2 flows (browser + device)
+│   └── mime/                # MIME parsing
+├── go.mod
+└── Makefile
+```
+
+## Data Flow
+
+```
+Gmail API
+    ↓
+sync-full / sync-incremental
+    ↓
+SQLite (system of record)
+    ↓
+build-cache (DuckDB ETL)
+    ↓
+Parquet files (analytics cache)
+    ↓
+TUI (DuckDB queries over Parquet)
+```
+
+## Key Packages
+
+| Package | Responsibility |
+|---|---|
+| `cmd/` | Cobra CLI commands, config loading |
+| `internal/store` | SQLite database operations, schema management |
+| `internal/sync` | Sync orchestration, MIME parsing, checkpoint management |
+| `internal/gmail` | Gmail API client with token bucket rate limiting |
+| `internal/oauth` | OAuth2 browser and device authorization flows |
+| `internal/query` | DuckDB engine over Parquet files, SQLite fallback |
+| `internal/tui` | Bubble Tea model, lipgloss-styled views |
+| `internal/deletion` | Deletion staging, manifest generation |
+| `internal/mime` | MIME message parsing, charset detection |
+
+## Design Decisions
+
+- **SQLite as system of record**: All message data lives in SQLite. Parquet is a derived cache.
+- **DuckDB for analytics**: Aggregate queries over denormalized Parquet are ~3000x faster than SQLite JOINs.
+- **Content-addressed attachments**: Deduplicated by SHA-256 hash, stored on disk.
+- **Resumable sync**: Checkpoints allow interrupted syncs to resume without re-downloading.
+- **Token bucket rate limiting**: Respects Gmail API quotas without manual throttling.

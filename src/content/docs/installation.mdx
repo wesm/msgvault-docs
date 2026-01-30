@@ -1,0 +1,52 @@
+---
+title: Installation
+description: Prerequisites and build instructions for msgvault.
+---
+
+## Prerequisites
+
+| Requirement | Version | Notes |
+|---|---|---|
+| Go | 1.21+ | [golang.org/dl](https://golang.org/dl/) |
+| GCC or Clang | any | Required for CGO (SQLite FTS5 support) |
+
+CGO is required because msgvault uses `mattn/go-sqlite3` which compiles SQLite as a C extension for full-text search (FTS5).
+
+## Build from Source
+
+```bash
+git clone https://github.com/wesm/msgvault.git
+cd msgvault
+```
+
+### Debug Build
+
+```bash
+make build
+```
+
+Produces `./msgvault` in the project root.
+
+### Release Build
+
+```bash
+make build-release
+```
+
+Optimized binary with stripped debug symbols.
+
+### Install
+
+```bash
+make install
+```
+
+Installs to `~/.local/bin` or `$GOPATH/bin`.
+
+## Verify
+
+```bash
+msgvault --help
+```
+
+You should see the list of available commands. Next, [configure OAuth credentials](/guides/oauth-setup/).

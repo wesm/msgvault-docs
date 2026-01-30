@@ -1,0 +1,29 @@
+---
+title: Exporting Messages
+description: Export messages as .eml files by internal or Gmail ID.
+---
+
+## Export as EML
+
+Export a single message as a standard `.eml` file:
+
+```bash
+# By internal message ID
+msgvault export-eml --message-id 12345 --output message.eml
+
+# By Gmail message ID
+msgvault export-eml --gmail-id 18abc123def --output message.eml
+
+# Output to stdout
+msgvault export-eml --gmail-id 18abc123def
+```
+
+## Flags
+
+| Flag | Description |
+|---|---|
+| `--message-id` | Internal database message ID |
+| `--gmail-id` | Gmail message ID (hex string) |
+| `--output` | Output file path (default: stdout) |
+
+The exported `.eml` file contains the original raw MIME data, decompressed from the zlib-compressed storage in the database.

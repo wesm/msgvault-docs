@@ -1,0 +1,75 @@
+---
+title: Data Storage
+description: SQLite, Parquet, content-addressed attachments, and token storage.
+---
+
+## Storage Layers
+
+| Layer | Role | Location |
+|---|---|---|
+| SQLite | System of record | `~/.msgvault/msgvault.db` |
+| Parquet | Analytics cache | `~/.msgvault/analytics/` |
+| Attachments | Content-addressed files | `~/.msgvault/attachments/` |
+| Tokens | OAuth credentials | `~/.msgvault/tokens/` |
+
+## SQLite (System of Record)
+
+All message data — metadata, labels, participants, and raw MIME — lives in a single SQLite database. This is the authoritative copy of your archive.
+
+Raw MIME data is stored compressed with zlib in the `message_raw` table.
+
+## Parquet (Analytics Cache)
+
+Denormalized Parquet files are built from SQLite for fast aggregate queries in the TUI. These are disposable and can be rebuilt at any time:
+
+```bash
+msgvault build-cache --full-rebuild
+```
+
+Directory structure:
+
+```
+analytics/
+├── messages/
+│   ├── year=2020/
+│   ├── year=2021/
+│   └── ...
+└── _last_sync.json
+```
+
+Partitioned by year for efficient time-range queries via DuckDB.
+
+## Content-Addressed Attachments
+
+Attachments are stored on disk, deduplicated by SHA-256 hash:
+
+```
+attachments/
+├── ab/
+│   └── abcd1234567890...   # full SHA-256 hash as filename
+├── cd/
+│   └── cdef9876543210...
+└── ...
+```
+
+The first two characters of the hash form the subdirectory (sharding). Multiple messages referencing the same attachment share one file.
+
+## Token Storage
+
+OAuth tokens are stored as JSON files per account:
+
+```
+tokens/
+├── personal@gmail.com.json
+└── work@company.com.json
+```
+
+Tokens refresh automatically. Protect this directory — tokens grant read/write access to Gmail.
+
+## Compression
+
+| Data | Format | Ratio |
+|---|---|---|
+| Raw MIME | zlib in SQLite BLOB | ~3-5x compression |
+| Parquet | Snappy (DuckDB default) | ~10x vs raw SQLite |
+| Attachments | Stored as-is (already compressed formats) | — |

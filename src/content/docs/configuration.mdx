@@ -1,0 +1,71 @@
+---
+title: Configuration
+description: Configuration file reference, environment variables, and file locations.
+---
+
+## Config File
+
+Default location: `~/.msgvault/config.toml`
+
+```toml
+[data]
+# Base data directory (default: ~/.msgvault)
+data_dir = "/path/to/msgvault/data"
+
+# Database path (default: {data_dir}/msgvault.db)
+db_path = "/path/to/msgvault.db"
+
+# Attachments directory (default: {data_dir}/attachments)
+attachments_dir = "/path/to/attachments"
+
+# Token storage directory (default: {data_dir}/tokens)
+tokens_dir = "/path/to/tokens"
+
+[oauth]
+# Path to Google OAuth client secrets JSON (required)
+client_secrets = "/path/to/client_secret.json"
+
+[sync]
+# Gmail API rate limit (requests per second)
+rate_limit_qps = 5
+```
+
+## Sections
+
+### `[data]`
+
+| Key | Default | Description |
+|---|---|---|
+| `data_dir` | `~/.msgvault` | Base directory for all data |
+| `db_path` | `{data_dir}/msgvault.db` | SQLite database path |
+| `attachments_dir` | `{data_dir}/attachments` | Content-addressed attachment storage |
+| `tokens_dir` | `{data_dir}/tokens` | OAuth token storage |
+
+### `[oauth]`
+
+| Key | Default | Description |
+|---|---|---|
+| `client_secrets` | — | Path to Google OAuth `client_secret.json` (required) |
+
+### `[sync]`
+
+| Key | Default | Description |
+|---|---|---|
+| `rate_limit_qps` | `5` | Gmail API requests per second |
+
+## Environment Variables
+
+| Variable | Description |
+|---|---|
+| `MSGVAULT_HOME` | Base directory for all data (default: `~/.msgvault`) |
+| `MSGVAULT_CONFIG` | Path to config file (default: `~/.msgvault/config.toml`) |
+
+## File Locations
+
+| Path | Contents |
+|---|---|
+| `~/.msgvault/config.toml` | Configuration file |
+| `~/.msgvault/msgvault.db` | SQLite database (system of record) |
+| `~/.msgvault/attachments/` | Content-addressed attachment files |
+| `~/.msgvault/tokens/` | OAuth tokens per account |
+| `~/.msgvault/analytics/` | Parquet cache files for TUI |

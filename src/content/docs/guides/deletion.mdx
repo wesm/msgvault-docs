@@ -1,0 +1,48 @@
+---
+title: Deletion Workflow
+description: Staging messages for deletion, reviewing manifests, and executing deletes.
+---
+
+## Overview
+
+msgvault supports a staged deletion workflow: select messages, review what will be deleted, then execute against Gmail.
+
+## Staging in the TUI
+
+1. Launch the TUI: `msgvault tui`
+2. Navigate to messages you want to delete
+3. Press `Space` to toggle individual messages
+4. Press `d` to stage selected messages for deletion
+5. Press `D` to stage all messages matching the current filter
+
+## Selection Keys
+
+| Key | Action |
+|---|---|
+| `Space` | Toggle selection on current row |
+| `A` | Select all visible rows |
+| `x` | Clear selection |
+| `d` | Stage selected for deletion |
+| `D` | Stage all matching current filter |
+
+## Deletion Manifests
+
+Staged deletions create manifests that record exactly which messages will be affected. Review these before executing.
+
+## Execution
+
+Deletions can be executed as:
+
+- **Trash**: Moves messages to Gmail's Trash (recoverable for 30 days)
+- **Permanent delete**: Permanently removes messages from Gmail
+
+:::danger
+Permanent deletion cannot be undone. Always verify your archive is complete before permanent deletion. Use `msgvault verify` to check integrity.
+:::
+
+## Safety Notes
+
+- Sync operations are always read-only
+- Deletion requires explicit staging and execution as separate steps
+- Manifests provide an audit trail of what was deleted
+- Use trash mode first to verify before permanent deletion

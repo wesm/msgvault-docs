@@ -1,0 +1,75 @@
+---
+title: Troubleshooting
+description: Common issues and solutions.
+---
+
+## OAuth Errors
+
+### "Error 403: access_denied"
+
+Your email isn't added as a test user. Go to **OAuth consent screen > Test users** and add your Gmail address.
+
+### "Access blocked: This app's request is invalid"
+
+The Gmail scope isn't configured. Verify you added `gmail.modify` scope and that Gmail API is enabled in your Google Cloud project.
+
+### "redirect_uri_mismatch"
+
+Wrong application type. Ensure you selected **Desktop app** when creating OAuth credentials.
+
+### General OAuth Issues
+
+1. Remove old tokens: `rm ~/.msgvault/tokens/you@gmail.com.json`
+2. Re-add account: `msgvault add-account you@gmail.com`
+3. Revoke and retry: [myaccount.google.com/permissions](https://myaccount.google.com/permissions)
+
+## Rate Limiting
+
+If you hit Gmail API rate limits during large syncs:
+
+1. Reduce `rate_limit_qps` in config (default: 5)
+2. Use `--limit` during initial testing
+3. Wait and retry — rate limits reset over time
+
+## Database Corruption
+
+If the database is corrupted:
+
+1. Back up your database: `cp ~/.msgvault/msgvault.db ~/.msgvault/msgvault.db.bak`
+2. Delete and re-sync:
+   ```bash
+   rm ~/.msgvault/msgvault.db
+   msgvault init-db
+   msgvault sync-full you@gmail.com
+   ```
+
+## Interrupted Syncs
+
+Run the same sync command again — it resumes from the last checkpoint:
+
+```bash
+msgvault sync-full you@gmail.com --after 2024-01-01 --before 2024-02-01
+```
+
+To force a fresh start:
+
+```bash
+msgvault sync-full you@gmail.com --noresume
+```
+
+## CGO / Build Errors
+
+If you get errors about missing C compiler:
+
+- **macOS**: Install Xcode Command Line Tools: `xcode-select --install`
+- **Linux**: Install GCC: `apt install gcc` or `dnf install gcc`
+
+CGO is required for `mattn/go-sqlite3` (FTS5 support).
+
+## TUI Not Showing Data
+
+If the TUI launches but shows no data:
+
+1. Verify sync completed: `msgvault stats`
+2. Rebuild the Parquet cache: `msgvault build-cache --full-rebuild`
+3. Check account filter: try `msgvault tui` without `--account`

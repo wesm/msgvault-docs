@@ -1,0 +1,46 @@
+---
+title: Multi-Account
+description: Archive multiple Gmail accounts in a single database.
+---
+
+## Adding Accounts
+
+Each Gmail account needs its own OAuth authorization:
+
+```bash
+msgvault add-account personal@gmail.com
+msgvault add-account work@company.com
+```
+
+All accounts share the same SQLite database and attachment storage.
+
+## Per-Account Sync
+
+Sync each account independently:
+
+```bash
+msgvault sync-full personal@gmail.com
+msgvault sync-full work@company.com
+
+# Incremental updates
+msgvault sync-incremental personal@gmail.com
+msgvault sync-incremental work@company.com
+```
+
+## Cross-Account Search
+
+Search queries run across all accounts by default:
+
+```bash
+msgvault search "quarterly report"
+```
+
+## TUI Filtering
+
+Filter the TUI to a specific account:
+
+```bash
+msgvault tui --account work@company.com
+```
+
+Or press `a` in the TUI to cycle through account filters interactively.

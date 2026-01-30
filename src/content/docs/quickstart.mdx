@@ -1,0 +1,58 @@
+---
+title: Quick Start
+description: Get up and running with msgvault in five steps.
+---
+
+## 1. Build & Install
+
+```bash
+git clone https://github.com/wesm/msgvault.git
+cd msgvault
+make install
+```
+
+Requires Go 1.21+ and a C compiler (GCC/Clang) for CGO. See [Installation](/installation/) for details.
+
+## 2. Configure OAuth
+
+Create a Google Cloud project, enable the Gmail API, and download your `client_secret.json`. See the full [OAuth Setup Guide](/guides/oauth-setup/).
+
+Create `~/.msgvault/config.toml`:
+
+```toml
+[oauth]
+client_secrets = "/path/to/client_secret.json"
+```
+
+## 3. Add Your Account
+
+```bash
+msgvault add-account you@gmail.com
+```
+
+This opens your browser for OAuth consent. For headless servers, use `--headless` for the [device authorization flow](/guides/headless/).
+
+## 4. Sync Email
+
+```bash
+# Test with a small batch first
+msgvault sync-full you@gmail.com --limit 100
+
+# Or sync a specific date range
+msgvault sync-full you@gmail.com --after 2024-01-01 --before 2024-02-01
+```
+
+## 5. Explore
+
+```bash
+# Search your archive
+msgvault search from:alice@example.com
+
+# Launch the interactive TUI
+msgvault tui
+
+# View stats
+msgvault stats
+```
+
+See [Searching](/usage/searching/) and [Interactive TUI](/usage/tui/) for more.

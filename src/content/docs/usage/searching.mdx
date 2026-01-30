@@ -1,0 +1,63 @@
+---
+title: Searching
+description: Gmail-like search syntax with full-text search and JSON output.
+---
+
+## Basic Usage
+
+```bash
+msgvault search <query>
+```
+
+## Search Operators
+
+| Operator | Description | Example |
+|---|---|---|
+| `from:` | Sender address | `from:alice@example.com` |
+| `to:` | Recipient address | `to:bob@example.com` |
+| `cc:` | CC recipient | `cc:team@example.com` |
+| `bcc:` | BCC recipient | `bcc:admin@example.com` |
+| `subject:` | Subject text | `subject:meeting` |
+| `label:` | Gmail label | `label:INBOX`, `label:SENT` |
+| `has:attachment` | Has attachments | `has:attachment` |
+| `before:` | Before date | `before:2024-06-01` |
+| `after:` | After date | `after:2024-01-01` |
+| `older_than:` | Relative date | `older_than:7d`, `2w`, `1m`, `1y` |
+| `newer_than:` | Relative date | `newer_than:30d` |
+| `larger:` | Minimum size | `larger:5M`, `100K` |
+| `smaller:` | Maximum size | `smaller:1M` |
+
+Bare words and `"quoted phrases"` perform full-text search across message subjects and bodies.
+
+## Examples
+
+```bash
+# Search by sender
+msgvault search from:alice@example.com
+
+# Subject search
+msgvault search subject:meeting
+
+# Date range
+msgvault search "after:2024-01-01 before:2024-06-01"
+
+# Messages with attachments
+msgvault search has:attachment
+
+# By label
+msgvault search label:INBOX
+
+# Combined filters
+msgvault search "from:boss@company.com has:attachment after:2024-01-01"
+
+# Full-text search
+msgvault search "quarterly report"
+```
+
+## JSON Output
+
+Add `--json` for machine-readable output:
+
+```bash
+msgvault search from:alice@example.com --json
+```

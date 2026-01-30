@@ -1,0 +1,70 @@
+---
+title: Google OAuth Setup
+description: Full walkthrough for creating Google Cloud OAuth credentials.
+---
+
+msgvault requires OAuth credentials to access the Gmail API. This guide walks through the complete setup.
+
+## Step 1: Create a Google Cloud Project
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select an existing one
+3. Note your project ID
+
+## Step 2: Enable the Gmail API
+
+1. Navigate to **APIs & Services > Library**
+2. Search for "Gmail API"
+3. Click **Enable**
+
+## Step 3: Configure OAuth Consent Screen
+
+1. Go to **APIs & Services > OAuth consent screen**
+2. Choose **External** user type (or **Internal** for Google Workspace)
+3. Fill in required fields:
+   - App name: `msgvault`
+   - User support email: your email
+   - Developer contact email: your email
+4. Click **Save and Continue**
+5. On the Scopes page, click **Add or Remove Scopes**
+6. Add the scope: `https://www.googleapis.com/auth/gmail.modify`
+7. Save and continue through the remaining screens
+8. Under **Test users**, add all Gmail addresses you want to sync
+
+:::note
+The `gmail.modify` scope enables deletion features. Sync operations are read-only regardless of scope.
+:::
+
+## Step 4: Create OAuth Client Credentials
+
+1. Go to **APIs & Services > Credentials**
+2. Click **Create Credentials > OAuth client ID**
+3. Choose **Desktop application**
+4. Name it `msgvault Desktop Client`
+5. Click **Create**
+6. Download the JSON file
+7. Save it as `client_secret.json` in a secure location
+
+:::caution
+Never commit `client_secret.json` to version control.
+:::
+
+## Step 5: Configure msgvault
+
+Create `~/.msgvault/config.toml`:
+
+```toml
+[oauth]
+client_secrets = "/path/to/your/client_secret.json"
+
+[sync]
+rate_limit_qps = 5
+```
+
+## Step 6: Add Your Account
+
+```bash
+msgvault add-account you@gmail.com
+```
+
+This opens your browser to Google's OAuth consent page. Sign in, grant access, and tokens are stored locally in `~/.msgvault/tokens/`.
