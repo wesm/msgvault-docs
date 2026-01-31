@@ -8,6 +8,7 @@
   --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --sl-text-body: 1rem;
   --sl-text-code: 1.25rem;
+  --sl-text-code-sm: 1rem;
   --sl-line-height: 1.45;
 
   /* Colors - pure grayscale */
@@ -108,7 +109,7 @@ code:not(pre code) {
   background: var(--sl-color-bg-inline-code) !important;
   border: 1px solid #2a2a2a;
   padding: 0.1em 0.3em;
-  font-size: 0.9em;
+  font-size: 1em;
 }
 
 /* Headings */

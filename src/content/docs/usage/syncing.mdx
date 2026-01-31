@@ -37,6 +37,12 @@ msgvault sync-full you@gmail.com
 msgvault sync-full you@gmail.com --noresume
 ```
 
+### What to expect
+
+The initial full sync downloads every message and attachment from Gmail, so it can take a while. In testing we have observed roughly 50 messages per second on fast internet, but the Gmail API has per-user quotas that may throttle throughput further. An account with hundreds of thousands of messages and large attachments may take several hours; an account with millions of messages could take significantly longer. We recommend starting with `--limit` or a date range to verify everything works before kicking off the full run.
+
+The good news: syncs are resumable (see below), and once the initial sync is complete, incremental syncs only fetch new and changed messages, which is much faster.
+
 ## Incremental Sync
 
 After the initial full sync, use incremental sync for efficient updates. It uses the Gmail History API to fetch only new and changed messages:

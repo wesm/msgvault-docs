@@ -40,6 +40,7 @@ export default defineConfig({
             { label: 'Analytics & Stats', slug: 'usage/analytics' },
             { label: 'LLM Chat', slug: 'usage/chat' },
             { label: 'MCP Server', slug: 'usage/mcp-server' },
+            { label: 'Deleting Email', slug: 'usage/deletion' },
             { label: 'Multi-Account', slug: 'usage/multi-account' },
           ],
         },
@@ -48,7 +49,6 @@ export default defineConfig({
           items: [
             { label: 'Google OAuth Setup', slug: 'guides/oauth-setup' },
             { label: 'Headless Server Setup', slug: 'guides/headless' },
-            { label: 'Deletion Workflow', slug: 'guides/deletion' },
             { label: 'Parquet Analytics', slug: 'guides/parquet' },
             { label: 'Verify Integrity', slug: 'guides/verification' },
           ],

@@ -9,7 +9,7 @@ The `chat` command launches an interactive REPL that lets you ask natural-langua
 
 ### Why a local archive matters
 
-Unlike tools that connect an LLM directly to your Gmail account via OAuth, msgvault never gives the AI access to your live email. The LLM queries a **read-only local archive**. It cannot send emails, modify labels, delete messages, or touch your account in any way. You control exactly when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/guides/deletion/)). There is no persistent OAuth session for the AI to exploit. If you care about privacy or reducing your attack surface, this separation is the point.
+Unlike tools that connect an LLM directly to your Gmail account via OAuth, msgvault never gives the AI access to your live email. The LLM queries a **read-only local archive**. It cannot send emails, modify labels, delete messages, or touch your account in any way. You control exactly when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). There is no persistent OAuth session for the AI to exploit. If you care about privacy or reducing your attack surface, this separation is the point.
 
 ## How It Works
 
