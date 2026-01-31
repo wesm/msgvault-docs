@@ -30,12 +30,12 @@ export default defineConfig({
         { label: 'Quick Start', slug: 'quickstart' },
         { label: 'Installation', slug: 'installation' },
         { label: 'Configuration', slug: 'configuration' },
+        { label: 'Interactive TUI', slug: 'usage/tui' },
         {
           label: 'Usage',
           items: [
             { label: 'Syncing Email', slug: 'usage/syncing' },
             { label: 'Searching', slug: 'usage/searching' },
-            { label: 'Interactive TUI', slug: 'usage/tui' },
             { label: 'Exporting Messages', slug: 'usage/exporting' },
             { label: 'Analytics & Stats', slug: 'usage/analytics' },
             { label: 'LLM Chat', slug: 'usage/chat' },
