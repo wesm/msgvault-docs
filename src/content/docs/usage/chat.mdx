@@ -9,7 +9,7 @@ The `chat` command launches an interactive REPL that lets you ask natural-langua
 
 ### Why a local archive matters
 
-Unlike tools that connect an LLM directly to your Gmail account via OAuth, msgvault never gives the AI access to your live email. The LLM queries a **read-only local archive** — it cannot send emails, modify labels, delete messages, or touch your account in any way. You control exactly when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/guides/deletion/)). There is no persistent OAuth session for the AI to exploit. If you care about privacy or reducing your attack surface, this separation is the point.
+Unlike tools that connect an LLM directly to your Gmail account via OAuth, msgvault never gives the AI access to your live email. The LLM queries a **read-only local archive**. It cannot send emails, modify labels, delete messages, or touch your account in any way. You control exactly when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/guides/deletion/)). There is no persistent OAuth session for the AI to exploit. If you care about privacy or reducing your attack surface, this separation is the point.
 
 ## How It Works
 
@@ -17,9 +17,9 @@ Unlike tools that connect an LLM directly to your Gmail account via OAuth, msgva
 Your question → Query planning → FTS5 / SQL retrieval → Context assembly → LLM answer
 ```
 
-1. **Query planning** — the LLM analyzes your question and generates one or more search queries
-2. **Retrieval** — msgvault runs those queries against the SQLite full-text index (or SQL for aggregate questions)
-3. **Answer generation** — retrieved messages are passed as context to the LLM, which produces a grounded answer with citations
+1. **Query planning**: the LLM analyzes your question and generates one or more search queries
+2. **Retrieval**: msgvault runs those queries against the SQLite full-text index (or SQL for aggregate questions)
+3. **Answer generation**: retrieved messages are passed as context to the LLM, which produces a grounded answer with citations
 
 ## Prerequisites
 
@@ -113,9 +113,9 @@ Searching archive...
 Retrieved 5 messages matching "Q3 budget" from alice@company.com.
 
 Alice sent three emails about the Q3 budget between July and September:
-1. **Jul 12** — Initial proposal requesting $50K for infrastructure [msg:4521]
-2. **Aug 3** — Revised numbers after the team meeting [msg:4892]
-3. **Sep 1** — Final approval confirmation [msg:5201]
+1. **Jul 12**: Initial proposal requesting $50K for infrastructure [msg:4521]
+2. **Aug 3**: Revised numbers after the team meeting [msg:4892]
+3. **Sep 1**: Final approval confirmation [msg:5201]
 
 msgvault chat> /quit
 ```

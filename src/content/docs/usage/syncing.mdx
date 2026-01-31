@@ -47,7 +47,7 @@ msgvault sync-incremental you@gmail.com
 
 ## Resumable Checkpoints
 
-If a sync is interrupted (network error, Ctrl+C), run the same command again — it resumes from the last checkpoint:
+If a sync is interrupted (network error, Ctrl+C), run the same command again. It resumes from the last checkpoint:
 
 ```bash
 # This resumes automatically
@@ -69,4 +69,4 @@ Reduce this value if you encounter rate limit errors during large syncs.
 
 ## Safety
 
-Sync operations are **read-only**. They use only `messages.list` and `messages.get` Gmail APIs. No write operations are performed — your Gmail data remains untouched.
+Sync operations are **read-only**. They use only `messages.list` and `messages.get` Gmail APIs. No write operations are performed. Your Gmail data remains untouched.

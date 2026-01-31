@@ -29,7 +29,7 @@ If you hit Gmail API rate limits during large syncs:
 
 1. Reduce `rate_limit_qps` in config (default: 5)
 2. Use `--limit` during initial testing
-3. Wait and retry — rate limits reset over time
+3. Wait and retry. Rate limits reset over time
 
 ## Database Corruption
 
@@ -45,7 +45,7 @@ If the database is corrupted:
 
 ## Interrupted Syncs
 
-Run the same sync command again — it resumes from the last checkpoint:
+Run the same sync command again. It resumes from the last checkpoint:
 
 ```bash
 msgvault sync-full you@gmail.com --after 2024-01-01 --before 2024-02-01

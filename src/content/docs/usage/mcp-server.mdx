@@ -9,7 +9,7 @@ The `mcp` command starts a [Model Context Protocol](https://modelcontextprotocol
 
 ### Security model
 
-The MCP server operates on your **local, read-only archive** — not your live Gmail account. Claude (or any other MCP client) cannot send emails, modify labels, delete messages, or access your Google credentials. You decide when to sync new messages and when to delete anything, through separate explicit commands. Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface: there is no live API session to exploit, no risk of bulk exfiltration, and no possibility of unauthorized actions against your account.
+The MCP server operates on your **local, read-only archive**, not your live Gmail account. Claude (or any other MCP client) cannot send emails, modify labels, delete messages, or access your Google credentials. You decide when to sync new messages and when to delete anything, through separate explicit commands. Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface: there is no live API session to exploit, no risk of bulk exfiltration, and no possibility of unauthorized actions against your account.
 
 ## Launch
 

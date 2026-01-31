@@ -50,7 +50,7 @@ go vet ./...
 
 ## SQL Guidelines
 
-- **Never use `SELECT DISTINCT` with JOINs** — use `EXISTS` subqueries instead (semi-joins)
+- **Never use `SELECT DISTINCT` with JOINs**: use `EXISTS` subqueries instead (semi-joins)
 - `EXISTS` is faster (stops at first match) and avoids duplicates at the source
 
 Instead of:

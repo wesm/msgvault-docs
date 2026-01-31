@@ -5,7 +5,7 @@ description: Denormalized Parquet cache for lightning-fast TUI analytics powered
 
 ## Why Parquet + DuckDB
 
-The TUI needs to aggregate across your entire archive — top senders, domains, labels, time series — and return results instantly as you drill down. SQLite JOINs across normalized tables cannot do this at interactive speeds on large archives.
+The TUI needs to aggregate across your entire archive (top senders, domains, labels, time series) and return results instantly as you drill down. SQLite JOINs across normalized tables cannot do this at interactive speeds on large archives.
 
 msgvault solves this with a denormalized Parquet cache queried by an embedded DuckDB engine. The result is aggregate queries **hundreds of times faster**: what takes seconds in SQLite returns in milliseconds from Parquet. The analytics layer has a tiny footprint compared to the full SQLite database with message bodies, so it loads instantly and stays out of your way.
 
@@ -35,11 +35,11 @@ The TUI automatically builds or updates the cache on launch when new messages ar
 
 The Parquet files contain a denormalized view of messages:
 
-- `from_email`, `from_domain` — sender info
-- `to_emails[]`, `labels[]` — arrays for recipients and labels
-- `subject`, `snippet` — message preview
-- `sent_at`, `size_estimate` — metadata
-- `has_attachments`, `attachment_count` — attachment info
+- `from_email`, `from_domain`: sender info
+- `to_emails[]`, `labels[]`: arrays for recipients and labels
+- `subject`, `snippet`: message preview
+- `sent_at`, `size_estimate`: metadata
+- `has_attachments`, `attachment_count`: attachment info
 
 Partitioned by `year` for efficient time-range queries.
 

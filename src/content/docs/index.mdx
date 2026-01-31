@@ -27,18 +27,18 @@ Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/quick
 
 ## Why msgvault?
 
-Your email is yours. msgvault downloads a complete local copy of your Gmail — every message, every attachment, every label — then everything runs offline against that archive. Search, analytics, the TUI, LLM chat, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
+Your email is yours. msgvault downloads a complete local copy of your Gmail (every message, every attachment, every label) then everything runs offline against that archive. Search, analytics, the TUI, LLM chat, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
 
-Years of PDFs, photos, documents, and spreadsheets buried in your inbox become ordinary files on your filesystem, deduplicated and instantly searchable. Your data is no longer locked behind a web interface or an API — it's just files on disk that you own and control.
+Years of PDFs, photos, documents, and spreadsheets buried in your inbox become ordinary files on your filesystem, deduplicated and instantly searchable. Your data is no longer locked behind a web interface or an API. It's just files on disk that you own and control.
 
 ## Features
 
 <CardGrid>
   <Card title="Full Gmail Backup" icon="document">
-    Downloads complete messages including raw MIME, labels, and metadata — plus every attachment. Every PDF, photo, spreadsheet, and document you've ever received or sent is extracted and stored locally, deduplicated by content hash. Once synced, everything works offline.
+    Downloads complete messages including raw MIME, labels, metadata, and every attachment. Every PDF, photo, spreadsheet, and document you've ever received or sent is extracted and stored locally, deduplicated by content hash. Once synced, everything works offline.
   </Card>
   <Card title="Lightning-Fast TUI" icon="laptop">
-    Explore hundreds of thousands of messages with instant aggregation and drill-down. Powered by DuckDB over Parquet — hundreds of times faster than SQL JOINs, in a tiny footprint.
+    Explore hundreds of thousands of messages with instant aggregation and drill-down. Powered by DuckDB over Parquet, hundreds of times faster than SQL JOINs, in a tiny footprint.
   </Card>
   <Card title="Full-Text Search" icon="magnifier">
     SQLite FTS5-powered search with Gmail-like query syntax. Search by sender, date, label, size, attachments, and more.
@@ -50,7 +50,7 @@ Years of PDFs, photos, documents, and spreadsheets buried in your inbox become o
     Uses Gmail History API for efficient updates after initial full sync. Resumable checkpoints for interrupted syncs.
   </Card>
   <Card title="LLM Chat" icon="comment">
-    Ask natural-language questions about your archive using any LLM — local models via Ollama, or cloud APIs like Anthropic and OpenAI. RAG-based retrieval with grounded, cited answers.
+    Ask natural-language questions about your archive using any LLM: local models via Ollama, or cloud APIs like Anthropic and OpenAI. RAG-based retrieval with grounded, cited answers.
   </Card>
   <Card title="MCP Server" icon="puzzle">
     Expose your archive to AI assistants like Claude Desktop via the Model Context Protocol.
