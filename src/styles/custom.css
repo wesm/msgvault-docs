@@ -7,7 +7,7 @@
   --sl-font: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --sl-text-body: 1rem;
-  --sl-text-code: 1.25rem;
+  --sl-text-code: 1rem;
   --sl-text-code-sm: 1rem;
   --sl-line-height: 1.45;
 
@@ -44,7 +44,7 @@
   --sl-color-text-link: #c0c0c0;
 
   /* Layout - maximize content width */
-  --sl-content-width: 75rem;
+  --sl-content-width: 60rem;
   --sl-sidebar-width: 18.2rem;
   --sl-content-pad-x: 1rem;
 }
