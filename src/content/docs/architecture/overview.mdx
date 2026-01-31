@@ -44,7 +44,7 @@ msgvault/
 
 - **Offline by design**: The Gmail API is only contacted during explicit `sync-full`, `sync-incremental`, and deletion commands. Every other operation (search, analytics, TUI, LLM chat, MCP) runs entirely against local data with no network access required. This means no background OAuth sessions, no persistent API connections, and no possibility of an external tool or AI assistant reaching your live mailbox.
 - **SQLite as system of record**: All message data lives in SQLite. Parquet is a derived cache.
-- **DuckDB + Parquet for analytics**: The TUI runs an embedded DuckDB engine over denormalized Parquet files, delivering aggregate queries hundreds of times faster than SQLite JOINs. The entire analytics cache for hundreds of thousands of messages fits in a few megabytes, making drill-down and re-aggregation feel instant.
+- **DuckDB + Parquet for analytics**: The TUI runs an embedded DuckDB engine over Parquet metadata exports, delivering aggregate queries hundreds of times faster than SQLite JOINs. The entire analytics cache for hundreds of thousands of messages fits in a few megabytes, making drill-down and re-aggregation feel instant.
 - **Content-addressed attachments**: Deduplicated by SHA-256 hash, stored on disk.
 - **Resumable sync**: Checkpoints allow interrupted syncs to resume without re-downloading.
 - **Token bucket rate limiting**: Respects Gmail API quotas without manual throttling.
