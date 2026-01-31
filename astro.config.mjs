@@ -30,6 +30,7 @@ export default defineConfig({
         { label: 'Quick Start', slug: 'quickstart' },
         { label: 'Installation', slug: 'installation' },
         { label: 'Configuration', slug: 'configuration' },
+        { label: 'CLI Reference', slug: 'cli-reference' },
         { label: 'Interactive TUI', slug: 'usage/tui' },
         {
           label: 'Usage',
@@ -53,7 +54,6 @@ export default defineConfig({
             { label: 'Verify Integrity', slug: 'guides/verification' },
           ],
         },
-        { label: 'CLI Reference', slug: 'cli-reference' },
         {
           label: 'Architecture',
           items: [
