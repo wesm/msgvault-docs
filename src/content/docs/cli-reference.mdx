@@ -187,6 +187,42 @@ msgvault build-cache [flags]
 
 ---
 
+## chat
+
+Launch the interactive LLM chat REPL for querying your archive with natural language.
+
+```bash
+msgvault chat [flags]
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `--provider` | `ollama` | LLM provider: `ollama`, `anthropic`, or `openai` |
+| `--server` | `http://localhost:11434` | Ollama API endpoint (Ollama provider only) |
+| `--model` | `llama3.1` | Model name (provider-specific) |
+| `--max-results` | `10` | Maximum messages to retrieve per query |
+| `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
+
+See [LLM Chat](/usage/chat/) for details and examples.
+
+---
+
+## mcp
+
+Start the Model Context Protocol server for AI assistant integration.
+
+```bash
+msgvault mcp [flags]
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
+
+See [MCP Server](/usage/mcp-server/) for configuration and tool reference.
+
+---
+
 ## repair-encoding
 
 Fix UTF-8 encoding issues in existing messages.

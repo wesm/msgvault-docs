@@ -12,7 +12,7 @@ const shouldRenderSearch =
 
 <div class="header sl-flex">
 	<div class="title-wrapper sl-flex">
-		<SiteTitle />
+		<a href="/" style="font-size: 1.5rem; font-weight: 700; letter-spacing: -0.03em; color: #ffffff; text-decoration: none;">msgvault</a>
 	</div>
 	<div class="sl-flex print:hidden">
 		{shouldRenderSearch && <Search />}
@@ -39,6 +39,19 @@ const shouldRenderSearch =
 		padding: 0.25rem;
 		margin: -0.25rem;
 		min-width: 0;
+	}
+
+	.site-title-custom {
+		font-size: 1.5rem;
+		font-weight: 700;
+		letter-spacing: -0.03em;
+		color: #ffffff;
+		text-decoration: none;
+	}
+
+	.site-title-custom:hover {
+		color: #ffffff !important;
+		text-decoration: none;
 	}
 
 	.right-group {

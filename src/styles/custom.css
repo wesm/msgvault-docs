@@ -6,7 +6,8 @@
   /* Typography */
   --sl-font: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --sl-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  --sl-text-body: 0.875rem;
+  --sl-text-body: 1rem;
+  --sl-text-code: 1.25rem;
   --sl-line-height: 1.45;
 
   /* Colors - pure grayscale */
@@ -43,7 +44,7 @@
 
   /* Layout - maximize content width */
   --sl-content-width: 75rem;
-  --sl-sidebar-width: 14rem;
+  --sl-sidebar-width: 18.2rem;
   --sl-content-pad-x: 1rem;
 }
 
@@ -74,7 +75,7 @@
 
 /* Base font size */
 html {
-  font-size: 14px;
+  font-size: 15px;
 }
 
 /* Content area compact padding */
@@ -90,7 +91,7 @@ html {
 .expressive-code pre {
   border: 1px solid #2a2a2a !important;
   background: #0f0f0f !important;
-  font-size: 0.8rem !important;
+  font-size: 0.95rem !important;
 }
 
 .expressive-code .frame {
@@ -119,6 +120,12 @@ h1, h2, h3, h4, h5, h6 {
 h1 {
   font-size: 1.4rem;
   color: #ffffff;
+}
+
+.hero h1 {
+  font-size: 3rem !important;
+  font-weight: 700;
+  letter-spacing: -0.04em;
 }
 
 h2 {
@@ -286,6 +293,15 @@ button, .button {
 .sl-link-card .icon {
   background: #1a1a1a !important;
   color: #c0c0c0 !important;
+}
+
+/* Splash page body text */
+[data-has-hero] .sl-markdown-content {
+  font-size: 1.15rem;
+}
+
+[data-has-hero] .card .body {
+  font-size: 1.15rem;
 }
 
 /* Hero */

@@ -16,14 +16,29 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
+## Install
+
+```bash
+git clone https://github.com/wesm/msgvault.git
+cd msgvault && make install
+```
+
+Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/quickstart/).
+
+## Why msgvault?
+
+Your email is yours. msgvault downloads a complete local copy of your Gmail — every message, every attachment, every label — then everything runs offline against that archive. Search, analytics, the TUI, LLM chat, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
+
+Years of PDFs, photos, documents, and spreadsheets buried in your inbox become ordinary files on your filesystem, deduplicated and instantly searchable. Your data is no longer locked behind a web interface or an API — it's just files on disk that you own and control.
+
 ## Features
 
 <CardGrid>
   <Card title="Full Gmail Backup" icon="document">
-    Downloads complete messages including raw MIME, attachments, labels, and metadata.
+    Downloads complete messages including raw MIME, labels, and metadata — plus every attachment. Every PDF, photo, spreadsheet, and document you've ever received or sent is extracted and stored locally, deduplicated by content hash. Once synced, everything works offline.
   </Card>
-  <Card title="Interactive TUI" icon="laptop">
-    Terminal interface for exploring your archive — drill down by sender, domain, label, or time period. Powered by DuckDB over Parquet.
+  <Card title="Lightning-Fast TUI" icon="laptop">
+    Explore hundreds of thousands of messages with instant aggregation and drill-down. Powered by DuckDB over Parquet — hundreds of times faster than SQL JOINs, in a tiny footprint.
   </Card>
   <Card title="Full-Text Search" icon="magnifier">
     SQLite FTS5-powered search with Gmail-like query syntax. Search by sender, date, label, size, attachments, and more.
@@ -34,6 +49,12 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
   <Card title="Incremental Sync" icon="rocket">
     Uses Gmail History API for efficient updates after initial full sync. Resumable checkpoints for interrupted syncs.
   </Card>
+  <Card title="LLM Chat" icon="comment">
+    Ask natural-language questions about your archive using any LLM — local models via Ollama, or cloud APIs like Anthropic and OpenAI. RAG-based retrieval with grounded, cited answers.
+  </Card>
+  <Card title="MCP Server" icon="puzzle">
+    Expose your archive to AI assistants like Claude Desktop via the Model Context Protocol.
+  </Card>
   <Card title="Safe Deletion" icon="warning">
     Stage messages for deletion in the TUI, review manifests, then trash or permanently delete from Gmail.
   </Card>
@@ -41,19 +62,4 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 ## How It Works
 
-```
-Gmail API  →  sync-full / sync-incremental  →  SQLite (system of record)
-                                                    ↓
-                                              Parquet cache (analytics)
-                                                    ↓
-                                              Interactive TUI / Search
-```
-
-## Install
-
-```bash
-git clone https://github.com/wesm/msgvault.git
-cd msgvault && make install
-```
-
-Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/quickstart/).
+<img src="/how-it-works.svg" alt="msgvault architecture: Gmail API syncs to SQLite, then offline Parquet analytics, FTS5 search, TUI, LLM Chat, and MCP Server" style="width: 100%; max-width: 960px; margin: 1.5rem auto; display: block;" />

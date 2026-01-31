@@ -1,0 +1,71 @@
+---
+title: MCP Server
+description: Expose your email archive to AI assistants like Claude Desktop via the Model Context Protocol.
+---
+
+## Overview
+
+The `mcp` command starts a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that exposes your email archive as a set of tools. This lets AI assistants like Claude Desktop search, read, and analyze your messages directly.
+
+### Security model
+
+The MCP server operates on your **local, read-only archive** — not your live Gmail account. Claude (or any other MCP client) cannot send emails, modify labels, delete messages, or access your Google credentials. You decide when to sync new messages and when to delete anything, through separate explicit commands. Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface: there is no live API session to exploit, no risk of bulk exfiltration, and no possibility of unauthorized actions against your account.
+
+## Launch
+
+```bash
+# Start the MCP server (stdio transport)
+msgvault mcp
+
+# Force SQL retrieval for all searches
+msgvault mcp --force-sql
+```
+
+## CLI Flags
+
+| Flag | Default | Description |
+|---|---|---|
+| `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
+
+## Claude Desktop Configuration
+
+Add the following to your Claude Desktop config file:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "msgvault": {
+      "command": "msgvault",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+If `msgvault` is not on your PATH, use the full path to the binary.
+
+## Available Tools
+
+The MCP server exposes the following tools to connected AI clients:
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `search_messages` | Full-text search with Gmail-like query syntax | `query` (string), `max_results` (int, optional) |
+| `get_message` | Retrieve a single message by ID | `message_id` (int) |
+| `list_messages` | List messages with filters | `from` (string), `to` (string), `label` (string), `before` (date), `after` (date), `limit` (int) |
+| `get_stats` | Archive statistics | — |
+| `aggregate` | Run aggregate queries (top senders, domains, labels, time series) | `group_by` (string), `limit` (int), `account` (string, optional) |
+
+## Example Usage with Claude
+
+Once configured, you can ask Claude questions like:
+
+- *"Search my email for messages from alice@example.com about the project proposal"*
+- *"How many emails did I receive last month?"*
+- *"Show me the top 10 senders in my archive"*
+- *"Find all messages with attachments larger than 5MB"*
+
+Claude will automatically call the appropriate msgvault tools to retrieve and analyze your messages.

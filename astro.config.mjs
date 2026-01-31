@@ -38,6 +38,8 @@ export default defineConfig({
             { label: 'Interactive TUI', slug: 'usage/tui' },
             { label: 'Exporting Messages', slug: 'usage/exporting' },
             { label: 'Analytics & Stats', slug: 'usage/analytics' },
+            { label: 'LLM Chat', slug: 'usage/chat' },
+            { label: 'MCP Server', slug: 'usage/mcp-server' },
             { label: 'Multi-Account', slug: 'usage/multi-account' },
           ],
         },

@@ -41,7 +41,9 @@ Partitioned by year for efficient time-range queries via DuckDB.
 
 ## Content-Addressed Attachments
 
-Attachments are stored on disk, deduplicated by SHA-256 hash:
+Every attachment from every message — PDFs, photos, documents, spreadsheets, archives — is extracted and stored as a plain file on your local filesystem. No more digging through Gmail's web UI or hitting API rate limits to retrieve your own files. Once synced, they are yours to browse, back up, or process however you like.
+
+Attachments are deduplicated by SHA-256 hash:
 
 ```
 attachments/

@@ -1,0 +1,123 @@
+---
+title: LLM Chat
+description: RAG-based conversational interface for querying your email archive using any LLM.
+---
+
+## Overview
+
+The `chat` command launches an interactive REPL that lets you ask natural-language questions about your email archive. It uses retrieval-augmented generation (RAG) to search your messages and synthesize answers. You can use a local model via Ollama or a cloud API like Anthropic or OpenAI.
+
+### Why a local archive matters
+
+Unlike tools that connect an LLM directly to your Gmail account via OAuth, msgvault never gives the AI access to your live email. The LLM queries a **read-only local archive** — it cannot send emails, modify labels, delete messages, or touch your account in any way. You control exactly when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/guides/deletion/)). There is no persistent OAuth session for the AI to exploit. If you care about privacy or reducing your attack surface, this separation is the point.
+
+## How It Works
+
+```
+Your question → Query planning → FTS5 / SQL retrieval → Context assembly → LLM answer
+```
+
+1. **Query planning** — the LLM analyzes your question and generates one or more search queries
+2. **Retrieval** — msgvault runs those queries against the SQLite full-text index (or SQL for aggregate questions)
+3. **Answer generation** — retrieved messages are passed as context to the LLM, which produces a grounded answer with citations
+
+## Prerequisites
+
+You need at least one LLM backend configured:
+
+### Local models (Ollama)
+
+Install [Ollama](https://ollama.com) and pull a model:
+
+```bash
+ollama pull llama3.1
+ollama list
+```
+
+### Cloud APIs
+
+Set your API key as an environment variable:
+
+```bash
+# Anthropic
+export ANTHROPIC_API_KEY=sk-ant-...
+
+# OpenAI
+export OPENAI_API_KEY=sk-...
+```
+
+## Launch
+
+```bash
+# Local model via Ollama (default)
+msgvault chat
+
+# Use a specific Ollama model
+msgvault chat --model llama3.1
+
+# Use Claude via Anthropic API
+msgvault chat --provider anthropic --model claude-sonnet-4-20250514
+
+# Use GPT via OpenAI API
+msgvault chat --provider openai --model gpt-4o
+
+# Connect to a remote Ollama instance
+msgvault chat --server http://remote-host:11434
+
+# Limit retrieval results
+msgvault chat --max-results 20
+
+# Force SQL mode for aggregate queries
+msgvault chat --force-sql
+```
+
+## CLI Flags
+
+| Flag | Default | Description |
+|---|---|---|
+| `--provider` | `ollama` | LLM provider: `ollama`, `anthropic`, or `openai` |
+| `--server` | `http://localhost:11434` | Ollama API endpoint (Ollama provider only) |
+| `--model` | `llama3.1` | Model name (provider-specific) |
+| `--max-results` | `10` | Maximum messages to retrieve per query |
+| `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
+
+## Configuration
+
+You can set defaults in your `config.toml` instead of passing flags each time:
+
+```toml
+[chat]
+provider = "ollama"           # or "anthropic", "openai"
+server = "http://localhost:11434"
+model = "llama3.1"
+max_results = 10
+```
+
+See [Configuration](/configuration/) for the full config reference.
+
+## Example Session
+
+```
+$ msgvault chat
+msgvault chat> Who emailed me the most in 2024?
+
+Searching archive...
+Retrieved 10 messages across 8 senders.
+
+Based on your archive, the top sender in 2024 was newsletter@example.com
+with 847 messages, followed by alice@company.com with 312 messages.
+
+msgvault chat> What did Alice say about the Q3 budget?
+
+Searching archive...
+Retrieved 5 messages matching "Q3 budget" from alice@company.com.
+
+Alice sent three emails about the Q3 budget between July and September:
+1. **Jul 12** — Initial proposal requesting $50K for infrastructure [msg:4521]
+2. **Aug 3** — Revised numbers after the team meeting [msg:4892]
+3. **Sep 1** — Final approval confirmation [msg:5201]
+
+msgvault chat> /quit
+```
+
+Type `/quit` or press `Ctrl+D` to exit the REPL.
