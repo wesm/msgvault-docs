@@ -5,7 +5,7 @@ description: Terminal interface for exploring, filtering, and managing your emai
 
 ## Performance
 
-The TUI is built on DuckDB querying denormalized Parquet files, not the raw SQLite database. This architecture delivers aggregate queries (top senders, domains, labels, time series) **hundreds of times faster** than equivalent SQLite JOINs. The Parquet analytics layer has a tiny footprint, so drill-down and re-aggregation feel instant even on very large archives.
+The TUI is built on DuckDB querying denormalized Parquet files, not the raw SQLite database. This architecture delivers aggregate queries (top senders, domains, labels, time series) **hundreds of times faster** than equivalent SQLite JOINs. The Parquet analytics layer has a small footprint, so drill-down and re-aggregation feel instant even on very large archives.
 
 See [Parquet Analytics](/guides/parquet/) for details on the cache format and how to rebuild it.
 

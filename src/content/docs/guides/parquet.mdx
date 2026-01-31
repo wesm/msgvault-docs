@@ -7,7 +7,7 @@ description: Denormalized Parquet cache for lightning-fast TUI analytics powered
 
 The TUI needs to aggregate across your entire archive (top senders, domains, labels, time series) and return results instantly as you drill down. SQLite JOINs across normalized tables cannot do this at interactive speeds on large archives.
 
-msgvault solves this with a denormalized Parquet cache queried by an embedded DuckDB engine. The result is aggregate queries **hundreds of times faster**: what takes seconds in SQLite returns in milliseconds from Parquet. The analytics layer has a tiny footprint compared to the full SQLite database with message bodies, so it loads instantly and stays out of your way.
+msgvault solves this with a denormalized Parquet cache queried by an embedded DuckDB engine. The result is aggregate queries **hundreds of times faster**: what takes seconds in SQLite returns in milliseconds from Parquet. The analytics layer has a small footprint compared to the full SQLite database with message bodies, so it loads instantly and stays out of your way.
 
 ## Building the Cache
 
