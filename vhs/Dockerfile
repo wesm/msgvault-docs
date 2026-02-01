@@ -8,7 +8,7 @@ WORKDIR /src
 RUN make build
 
 # Stage 2: VHS recording runtime (Debian to match glibc builder)
-FROM debian:trixie-slim
+FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
@@ -17,17 +17,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     ca-certificates \
     curl \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
-# Install ttyd from GitHub (not in Debian repos)
-ARG TARGETARCH
-RUN case "${TARGETARCH}" in \
-      arm64) TTYD_ARCH="aarch64" ;; \
-      *)     TTYD_ARCH="x86_64" ;; \
-    esac && \
-    curl -fsSL -o /usr/local/bin/ttyd \
-      "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.${TTYD_ARCH}" && \
-    chmod +x /usr/local/bin/ttyd
+# Build ttyd from source (not in Debian repos, prebuilt binaries need newer glibc)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    cmake g++ pkg-config libwebsockets-dev libjson-c-dev libssl-dev \
+    && git clone --depth 1 --branch 1.7.7 https://github.com/tsl0922/ttyd.git /tmp/ttyd \
+    && cd /tmp/ttyd && mkdir build && cd build \
+    && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j$(nproc) \
+    && cp ttyd /usr/local/bin/ttyd \
+    && rm -rf /tmp/ttyd \
+    && apt-get purge -y cmake g++ pkg-config \
+    && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 
 # Install MesloLGS Nerd Font for consistent glyph rendering
 RUN mkdir -p /usr/share/fonts/meslo && \
