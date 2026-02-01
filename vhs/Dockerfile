@@ -7,17 +7,17 @@ COPY . /src
 WORKDIR /src
 RUN make build
 
-# Stage 2: VHS recording runtime
-FROM alpine:3.19
+# Stage 2: VHS recording runtime (Debian to match glibc builder)
+FROM debian:bookworm-slim
 
-RUN apk add --no-cache \
+RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ffmpeg \
     chromium \
     fontconfig \
-    ttyd \
     ca-certificates \
-    curl
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
 # Install MesloLGS Nerd Font for consistent glyph rendering
 RUN mkdir -p /usr/share/fonts/meslo && \
@@ -40,9 +40,9 @@ RUN VHS_VERSION="0.8.0" && \
     rm -rf /tmp/vhs_*
 
 # Chromium no-sandbox wrapper (required in Docker)
-RUN mv /usr/bin/chromium-browser /usr/bin/chromium-browser-real && \
-    printf '#!/bin/sh\nexec /usr/bin/chromium-browser-real --no-sandbox "$@"\n' > /usr/bin/chromium-browser && \
-    chmod +x /usr/bin/chromium-browser
+RUN mv /usr/bin/chromium /usr/bin/chromium-real && \
+    printf '#!/bin/sh\nexec /usr/bin/chromium-real --no-sandbox "$@"\n' > /usr/bin/chromium && \
+    chmod +x /usr/bin/chromium
 
 # Copy msgvault binary from builder
 COPY --from=builder /src/msgvault /usr/local/bin/msgvault

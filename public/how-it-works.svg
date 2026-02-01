@@ -76,13 +76,16 @@
   <!-- Arrow: Parquet down to TUI -->
   <line x1="660" y1="278" x2="660" y2="338" class="arrow-down"/>
 
+  <!-- Arrow: FTS5 down-right to TUI -->
+  <path d="M 460 278 L 460 310 L 610 310 L 610 338" class="arrow-down"/>
+
   <!-- Arrow: FTS5 down to Search CLI -->
   <line x1="400" y1="278" x2="400" y2="338" class="arrow-down"/>
 
   <!-- TUI box -->
   <rect x="560" y="340" width="200" height="58" class="box" rx="0"/>
   <text x="660" y="367" text-anchor="middle" class="label">Interactive TUI</text>
-  <text x="660" y="384" text-anchor="middle" class="sublabel">Parquet + DuckDB</text>
+  <text x="660" y="384" text-anchor="middle" class="sublabel">DuckDB + FTS5</text>
 
   <!-- Search / LLM Chat box -->
   <rect x="300" y="340" width="200" height="58" class="box" rx="0"/>
