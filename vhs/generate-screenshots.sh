@@ -84,6 +84,37 @@ sleep 0.5
 send Escape
 sleep 1
 
+# --- Search screenshots (at top-level Senders) ---
+
+# Search for a sender
+send "/"
+sleep 0.5
+send "benson"
+sleep 1
+capture "tui-search-sender"
+
+# Drill into the benson result
+send Enter
+sleep 0.5
+wait_until "Date"
+sleep 0.5
+capture "tui-search-drilldown"
+
+# Search within the drilled-down messages
+send "/"
+sleep 0.5
+send "spring"
+sleep 1
+capture "tui-search-subject"
+
+# Clear search and return to top-level Senders
+send Escape
+sleep 0.5
+send Escape
+sleep 0.5
+send Escape
+sleep 1
+
 # 3. Domains view (cycle: Sender -> Recipient -> Domain)
 send "g"
 wait_until "Recipient"

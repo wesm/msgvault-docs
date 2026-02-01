@@ -71,6 +71,19 @@ From a drill-down view, press `g` to re-aggregate the filtered messages by a dif
   <Screenshot src="/tui-subgroup-time.svg" alt="Sub-grouped by Time after drilling into a sender" />
 </div>
 
+## Searching
+
+Press `/` to open a search bar that filters the current view in real time. Matching text is highlighted in the results. At the aggregate level (Senders, Domains, etc.), search runs fast DuckDB queries over Parquet, so results appear instantly even on large archives.
+
+<Screenshot src="/tui-search-sender.svg" alt="msgvault TUI search filtering senders by name with highlighted matches" />
+
+Search also works after drill-down. Drill into a result, then press `/` again to search within that context. This second-level search uses deep FTS5 full-text search over message subjects and bodies. You can progressively narrow results: find a sender, drill in, then search for a specific subject or keyword.
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+  <Screenshot src="/tui-search-drilldown.svg" alt="Drilled into search result showing messages from a specific sender" />
+  <Screenshot src="/tui-search-subject.svg" alt="Searching within a sender's messages by subject keyword with highlighted matches" />
+</div>
+
 ## Keyboard Shortcuts
 
 | Key | Action |
