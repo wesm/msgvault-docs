@@ -1,7 +1,7 @@
 # Hero banner recording: launch TUI, browse senders, drill down, navigate back
 Output ./output/tui-hero.webm
 
-Set Theme "dark"
+Set Theme "Dark+"
 Set FontFamily "MesloLGS NF"
 Set FontSize 14
 Set Width 1200

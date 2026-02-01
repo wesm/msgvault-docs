@@ -1,7 +1,7 @@
 # Drill-down navigation: select sender, drill down, sort, navigate back
 Output ./output/tui-drilldown.webm
 
-Set Theme "dark"
+Set Theme "Dark+"
 Set FontFamily "MesloLGS NF"
 Set FontSize 14
 Set Width 1200
