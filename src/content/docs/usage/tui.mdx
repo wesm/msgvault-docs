@@ -3,11 +3,13 @@ title: Interactive TUI
 description: Terminal interface for exploring, filtering, and managing your email archive.
 ---
 
+import Screenshot from '../../../components/Screenshot.astro';
+
 ## Performance
 
 The TUI is built on DuckDB querying Parquet metadata exports, not the raw SQLite database. This architecture delivers aggregate queries (top senders, domains, labels, time series) **hundreds of times faster** than equivalent SQLite JOINs. The Parquet analytics layer has a small footprint, so drill-down and re-aggregation feel instant even on very large archives.
 
-See [Parquet Analytics](/guides/parquet/) for details on the cache format and how to rebuild it.
+See [Data Storage](/architecture/storage/) for details on the cache format and how to rebuild it.
 
 ## Launch
 
@@ -21,7 +23,7 @@ msgvault tui --account you@gmail.com
 
 The TUI automatically builds or updates the Parquet analytics cache on launch when new messages are detected.
 
-<img src="/tui-senders.svg" alt="msgvault TUI showing the Senders view with message counts and sizes" style="width: 100%; max-width: 800px; margin: 1rem 0; border-radius: 6px;" />
+<Screenshot src="/tui-senders.svg" alt="msgvault TUI showing the Senders view with message counts and sizes" />
 
 ## View Modes
 
@@ -35,13 +37,13 @@ The TUI provides five aggregate view modes. Press `g` to cycle through them:
 | Labels | Aggregate by Gmail label |
 | Time | Aggregate by time period (year/month/day) |
 
-<img src="/tui-labels.svg" alt="msgvault TUI Labels view showing Gmail label breakdown" style="width: 100%; max-width: 800px; margin: 1rem 0; border-radius: 6px;" />
+<Screenshot src="/tui-labels.svg" alt="msgvault TUI Labels view showing Gmail label breakdown" />
 
 ## Navigation
 
 Press `Enter` to drill down into any row (e.g., click a sender to see their messages). Press `Esc` or `Backspace` to go back.
 
-<img src="/tui-drilldown.svg" alt="msgvault TUI drill-down showing messages from a specific sender" style="width: 100%; max-width: 800px; margin: 1rem 0; border-radius: 6px;" />
+<Screenshot src="/tui-drilldown.svg" alt="msgvault TUI drill-down showing messages from a specific sender" />
 
 ## Keyboard Shortcuts
 
@@ -67,6 +69,12 @@ Press `Enter` to drill down into any row (e.g., click a sender to see their mess
 
 ## Deletion Staging
 
-Select messages with `Space`, then press `d` to stage them for deletion. See [Deleting Email](/usage/deletion/) for the full process.
+You can stage messages for deletion directly from the TUI. Select individual rows with `Space`, then press `d` to stage them. To stage an entire group (all messages from a sender, all messages with a label, etc.), press `D` from any aggregate view.
 
-<img src="/tui-selection.svg" alt="msgvault TUI with rows selected for deletion staging" style="width: 100%; max-width: 800px; margin: 1rem 0; border-radius: 6px;" />
+<Screenshot src="/tui-selection.svg" alt="msgvault TUI with rows selected for deletion staging" />
+
+A confirmation dialog shows exactly how many messages will be staged before anything happens. Messages are not deleted immediately; they are placed in a deletion batch that you review and execute separately with `msgvault delete-staged`.
+
+<Screenshot src="/tui-deletion.svg" alt="msgvault TUI deletion confirmation dialog showing bulk staging" />
+
+See [Deleting Email](/usage/deletion/) for the full deletion workflow.

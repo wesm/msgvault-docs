@@ -1,0 +1,26 @@
+---
+interface Props {
+  src: string;
+  alt: string;
+}
+
+const { src, alt } = Astro.props;
+---
+
+<figure class="screenshot" data-lightbox>
+  <img src={src} alt={alt} loading="lazy" />
+</figure>
+
+<style>
+  .screenshot {
+    margin: 1rem 0;
+    cursor: zoom-in;
+  }
+
+  .screenshot img {
+    width: 100%;
+    max-width: 800px;
+    border-radius: 6px;
+    display: block;
+  }
+</style>

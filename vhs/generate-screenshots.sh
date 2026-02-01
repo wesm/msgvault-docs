@@ -104,7 +104,17 @@ send Space
 sleep 0.5
 capture "tui-selection"
 
-# Quit TUI
+# 7. Group deletion confirmation dialog
+send Down
+sleep 0.3
+send D
+wait_until "Confirm Deletion"
+sleep 0.5
+capture "tui-deletion"
+
+# Cancel and quit
+send "n"
+sleep 0.5
 send "q"
 sleep 1
 
@@ -121,13 +131,13 @@ sleep 0.3
 send "clear" Enter
 sleep 0.5
 
-# 7. stats
+# 8. stats
 send "msgvault stats" Enter
 wait_until "Database:"
 sleep 0.5
 capture "stats"
 
-# 8. list-senders
+# 9. list-senders
 send "clear" Enter
 sleep 0.5
 send "msgvault list-senders --limit 15" Enter

@@ -8,7 +8,7 @@ hero:
   tagline: Archive a lifetime of email and chat. Analytics and search in milliseconds. Query with AI, entirely offline.
   actions:
     - text: Quick Start
-      link: /quickstart/
+      link: /setup/
       icon: right-arrow
     - text: GitHub
       link: https://github.com/wesm/msgvault
@@ -20,14 +20,15 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
 
 Currently supports Gmail, with WhatsApp and other messaging platforms planned.
 
+Read the [Introduction](/introduction/) to learn more about why this project was created.
+
 ## Install
 
 ```bash
-git clone https://github.com/wesm/msgvault.git
-cd msgvault && make install
+curl -fsSL https://msgvault.io/install.sh | bash
 ```
 
-Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/quickstart/).
+Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/setup/). You can also [build from source](/setup/#build-from-source).
 
 ## Why msgvault?
 

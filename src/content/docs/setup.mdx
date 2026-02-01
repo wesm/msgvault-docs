@@ -1,0 +1,84 @@
+---
+title: Setup Guide
+description: Install msgvault, configure OAuth, and sync your first emails.
+---
+
+import Screenshot from '../../components/Screenshot.astro';
+
+## Install Release
+
+```bash
+curl -fsSL https://msgvault.io/install.sh | bash
+```
+
+The installer detects your OS and architecture, downloads the latest release from [GitHub Releases](https://github.com/wesm/msgvault/releases), verifies the SHA-256 checksum, and installs the binary.
+
+Verify the installation:
+
+```bash
+msgvault --help
+```
+
+## Build From Source
+
+Requires Go 1.21+ and a C compiler (GCC or Clang). CGO is required because msgvault uses `mattn/go-sqlite3` which compiles SQLite as a C extension for full-text search (FTS5).
+
+```bash
+git clone https://github.com/wesm/msgvault.git
+cd msgvault
+make install
+```
+
+Installs to `~/.local/bin` or `$GOPATH/bin`. For a debug build use `make build`, or `make build-release` for an optimized binary with stripped debug symbols.
+
+Verify the installation:
+
+```bash
+msgvault --help
+```
+
+## Configure OAuth
+
+Create a Google Cloud project, enable the Gmail API, and download your `client_secret.json`. See the full [OAuth Setup Guide](/guides/oauth-setup/).
+
+Create `~/.msgvault/config.toml`:
+
+```toml
+[oauth]
+client_secrets = "/path/to/client_secret.json"
+```
+
+## Add Your Account
+
+```bash
+msgvault add-account you@gmail.com
+```
+
+This opens your browser for OAuth consent. For headless servers, use `--headless` for the [device authorization flow](/guides/headless/).
+
+## Sync Email
+
+```bash
+# Test with a small batch first
+msgvault sync-full you@gmail.com --limit 100
+
+# Or sync a specific date range
+msgvault sync-full you@gmail.com --after 2024-01-01 --before 2024-02-01
+```
+
+## Explore
+
+```bash
+# Search your archive
+msgvault search from:alice@example.com
+
+# Launch the interactive TUI
+msgvault tui
+
+# View stats
+msgvault stats
+```
+
+<Screenshot src="/tui-senders.svg" alt="msgvault TUI showing the Senders view" />
+
+See [Searching](/usage/searching/) and [Interactive TUI](/usage/tui/) for more.

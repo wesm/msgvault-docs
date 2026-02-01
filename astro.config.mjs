@@ -23,6 +23,10 @@ export default defineConfig({
       },
       head: [
         {
+          tag: 'script',
+          attrs: { src: '/lightbox.js', defer: true },
+        },
+        {
           tag: 'meta',
           attrs: { property: 'og:type', content: 'website' },
         },
@@ -48,11 +52,11 @@ export default defineConfig({
         },
       ],
       sidebar: [
-        { label: 'Quick Start', slug: 'quickstart' },
-        { label: 'Installation', slug: 'installation' },
+        { label: 'Introduction', slug: 'introduction' },
+        { label: 'Setup Guide', slug: 'setup' },
+        { label: 'Interactive TUI', slug: 'usage/tui' },
         { label: 'Configuration', slug: 'configuration' },
         { label: 'CLI Reference', slug: 'cli-reference' },
-        { label: 'Interactive TUI', slug: 'usage/tui' },
         {
           label: 'Usage',
           items: [
@@ -71,15 +75,13 @@ export default defineConfig({
           items: [
             { label: 'Google OAuth Setup', slug: 'guides/oauth-setup' },
             { label: 'Headless Server Setup', slug: 'guides/headless' },
-            { label: 'Parquet Analytics', slug: 'guides/parquet' },
-            { label: 'Verify Integrity', slug: 'guides/verification' },
+{ label: 'Verify Integrity', slug: 'guides/verification' },
           ],
         },
         {
           label: 'Architecture',
           items: [
             { label: 'Overview', slug: 'architecture/overview' },
-            { label: 'Database Schema', slug: 'architecture/schema' },
             { label: 'Data Storage', slug: 'architecture/storage' },
           ],
         },

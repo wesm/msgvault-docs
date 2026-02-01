@@ -1,6 +1,6 @@
 ---
 title: Data Storage
-description: SQLite, Parquet, content-addressed attachments, and token storage.
+description: SQLite schema, Parquet analytics cache, content-addressed attachments, and token storage.
 ---
 
 ## Storage Layers
@@ -16,13 +16,133 @@ description: SQLite, Parquet, content-addressed attachments, and token storage.
 
 All message data (metadata, labels, participants, and raw MIME) lives in a single SQLite database. This is the authoritative copy of your archive.
 
-Raw MIME data is stored compressed with zlib in the `message_raw` table.
+### Core Tables
+
+**sources** -- Gmail accounts with sync state.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `source_type` | TEXT | `gmail` |
+| `identifier` | TEXT | Email address |
+| `display_name` | TEXT | Account display name |
+| `sync_cursor` | TEXT | Gmail history ID for incremental sync |
+| `last_sync_at` | DATETIME | Last sync timestamp |
+
+**conversations** -- Gmail thread abstraction.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `source_id` | INTEGER FK | References `sources` |
+| `source_conversation_id` | TEXT | Gmail thread ID |
+| `conversation_type` | TEXT | `email_thread` |
+| `message_count` | INTEGER | Denormalized count |
+| `last_message_at` | DATETIME | Latest message timestamp |
+
+**messages** -- Message metadata. Foreign key to `conversations`.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `conversation_id` | INTEGER FK | References `conversations` |
+| `source_id` | INTEGER FK | References `sources` |
+| `source_message_id` | TEXT | Gmail message ID |
+| `message_type` | TEXT | `email` |
+| `sent_at` | DATETIME | Send timestamp |
+| `sender_id` | INTEGER FK | References `participants` |
+| `subject` | TEXT | Email subject |
+| `body_text` | TEXT | Plain text content |
+| `snippet` | TEXT | Preview excerpt |
+| `size_estimate` | INTEGER | Approximate size in bytes |
+| `has_attachments` | BOOLEAN | Attachment flag |
+| `deleted_at` | DATETIME | Soft delete timestamp |
+
+**message_raw** -- Raw MIME blob storage, compressed with zlib.
+
+| Column | Type | Description |
+|---|---|---|
+| `message_id` | INTEGER PK/FK | References `messages` |
+| `raw_data` | BLOB | Compressed MIME data |
+| `compression` | TEXT | `zlib` |
+
+**participants** -- Unified contacts.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `email_address` | TEXT | Email address (unique index) |
+| `display_name` | TEXT | Contact name |
+| `domain` | TEXT | Extracted domain |
+
+**message_recipients** -- From/To/Cc/Bcc mapping.
+
+| Column | Type | Description |
+|---|---|---|
+| `message_id` | INTEGER FK | References `messages` |
+| `participant_id` | INTEGER FK | References `participants` |
+| `recipient_type` | TEXT | `from`, `to`, `cc`, `bcc` |
+
+**labels / message_labels** -- Gmail labels (many-to-many).
+
+| Table | Key Columns |
+|---|---|
+| `labels` | `id`, `source_id`, `source_label_id`, `name`, `label_type` |
+| `message_labels` | `message_id`, `label_id` |
+
+**attachments** -- Content-addressed attachment metadata.
+
+| Column | Type | Description |
+|---|---|---|
+| `id` | INTEGER PK | Auto-increment |
+| `message_id` | INTEGER FK | References `messages` |
+| `filename` | TEXT | Original filename |
+| `mime_type` | TEXT | MIME type |
+| `size` | INTEGER | Size in bytes |
+| `content_hash` | TEXT | SHA-256 hash |
+| `storage_path` | TEXT | Relative path: `ab/abcd1234...` |
+
+**sync_runs / sync_checkpoints** -- Sync state for resumability.
+
+| Table | Purpose |
+|---|---|
+| `sync_runs` | Track each sync operation (start, end, counts, errors) |
+| `sync_checkpoints` | Resume point per source (message ID, page token) |
+
+### FTS5 Virtual Table
+
+```sql
+CREATE VIRTUAL TABLE messages_fts USING fts5(
+    subject,
+    body_text,
+    content='messages',
+    content_rowid='id'
+);
+```
+
+Powers full-text search via `msgvault search`. Indexed on `subject` and `body_text` columns.
+
+### Relationships
+
+```
+sources ─┬─< conversations ─< messages ─┬─< message_recipients ─> participants
+         │                               ├─< message_labels ─> labels
+         │                               ├── message_raw
+         │                               └─< attachments
+         └─< labels
+```
 
 ## Parquet (Analytics Cache)
 
-Denormalized Parquet files are built from SQLite for fast aggregate queries in the TUI. These are disposable and can be rebuilt at any time:
+The TUI needs to aggregate across your entire archive (top senders, domains, labels, time series) and return results instantly as you drill down. SQLite JOINs across normalized tables cannot do this at interactive speeds on large archives. msgvault solves this with denormalized Parquet files queried by an embedded DuckDB engine, delivering aggregate queries hundreds of times faster than SQLite.
+
+The Parquet cache is disposable and can be rebuilt at any time. The TUI automatically builds or updates it on launch when new messages are detected.
 
 ```bash
+# Manual build
+msgvault build-cache
+
+# Full rebuild (discard existing)
 msgvault build-cache --full-rebuild
 ```
 
@@ -34,10 +154,15 @@ analytics/
 │   ├── year=2020/
 │   ├── year=2021/
 │   └── ...
+├── participants/
+├── message_recipients/
+├── labels/
+├── attachments/
+├── sources/
 └── _last_sync.json
 ```
 
-Partitioned by year for efficient time-range queries via DuckDB.
+Messages are partitioned by year for efficient time-range queries. The entire analytics cache is typically a few MB even for hundreds of thousands of messages, compared to the much larger SQLite database with full message bodies.
 
 ## Content-Addressed Attachments
 
