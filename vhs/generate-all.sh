@@ -14,7 +14,7 @@ Usage: $(basename "$0") [OPTIONS]
 Record msgvault TUI demos as .webm videos using VHS.
 
 Options:
-  --repo PATH     Path to msgvault source repo (or set MSGVAULT_REPO)
+  --repo PATH     Path to msgvault source repo (default: ../msgvault sibling dir)
   --tape NAME     Record a single tape (without .tape extension)
   --list          List available tapes
   --skip-data     Skip demo data generation
@@ -30,7 +30,7 @@ list_tapes() {
     done
 }
 
-REPO="${MSGVAULT_REPO:-}"
+REPO="${MSGVAULT_REPO:-$SCRIPT_DIR/../../msgvault}"
 SINGLE_TAPE=""
 SKIP_DATA=false
 SKIP_BUILD=false
@@ -47,12 +47,11 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [[ -z "$REPO" ]]; then
-    echo "Error: set MSGVAULT_REPO or pass --repo PATH to the msgvault source."
+REPO="$(cd "$REPO" 2>/dev/null && pwd)" || {
+    echo "Error: msgvault repo not found at $REPO"
+    echo "Pass --repo PATH or set MSGVAULT_REPO."
     exit 1
-fi
-
-REPO="$(cd "$REPO" && pwd)"
+}
 
 # --- Step 1: Generate demo data ---
 if [[ "$SKIP_DATA" == false ]]; then
