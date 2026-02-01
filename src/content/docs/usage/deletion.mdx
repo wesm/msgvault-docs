@@ -48,11 +48,8 @@ Staged deletions create manifests that record exactly which messages will be aff
 # List pending deletion batches
 msgvault delete-staged --list
 
-# Execute deletion (trash mode, recoverable for 30 days)
+# Execute deletion (permanent)
 msgvault delete-staged --account you@gmail.com
-
-# Execute permanent deletion
-msgvault delete-staged --account you@gmail.com --permanent
 ```
 
 :::danger
@@ -65,4 +62,4 @@ Permanent deletion cannot be undone on Gmail's servers. Always verify your local
 - Deletion only affects Gmail's servers, never your local archive
 - Deletion requires explicit staging and execution as separate steps
 - Manifests provide an audit trail of what was deleted
-- Use trash mode first to verify before permanent deletion
+- Review staged manifests carefully before executing, as deletion is permanent

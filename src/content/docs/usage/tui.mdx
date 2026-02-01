@@ -5,12 +5,6 @@ description: Terminal interface for exploring, filtering, and managing your emai
 
 import Screenshot from '../../../components/Screenshot.astro';
 
-## Performance
-
-The TUI is built on DuckDB querying Parquet metadata exports, not the raw SQLite database. This architecture delivers aggregate queries (top senders, domains, labels, time series) **hundreds of times faster** than equivalent SQLite JOINs. The Parquet analytics layer has a small footprint, so drill-down and re-aggregation feel instant even on very large archives.
-
-See [Data Storage](/architecture/storage/) for details on how this works.
-
 ## Launch
 
 ```bash
@@ -67,8 +61,14 @@ Press `Enter` to drill into any row. For example, selecting a sender shows their
 From a drill-down view, press `g` to re-aggregate the filtered messages by a different dimension. You can think of this like an interactive pivot table. The cycle skips the dimension you drilled into, so drilling into a sender and pressing `g` cycles through Recipients, Domains, Labels, and Time.
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-  <Screenshot src="/tui-subgroup-recipients.svg" alt="Sub-grouped by Recipients after drilling into a sender" />
-  <Screenshot src="/tui-subgroup-time.svg" alt="Sub-grouped by Time after drilling into a sender" />
+  <figure style="margin: 0; text-align: center;" data-lightbox>
+    <img src="/tui-subgroup-recipients.svg" alt="Sub-grouped by Recipients after drilling into a sender" style="width: 100%; border-radius: 4px;" />
+    <figcaption style="font-size: 0.8rem; color: #888; margin-top: 0.3rem;">A sender's email grouped by recipient</figcaption>
+  </figure>
+  <figure style="margin: 0; text-align: center;" data-lightbox>
+    <img src="/tui-subgroup-time.svg" alt="Sub-grouped by Time after drilling into a sender" style="width: 100%; border-radius: 4px;" />
+    <figcaption style="font-size: 0.8rem; color: #888; margin-top: 0.3rem;">A sender's mail grouped by month</figcaption>
+  </figure>
 </div>
 
 ## Searching
@@ -117,3 +117,9 @@ A confirmation dialog shows exactly how many messages will be staged before anyt
 <Screenshot src="/tui-deletion.svg" alt="msgvault TUI deletion confirmation dialog showing bulk staging" />
 
 See [Deleting Email](/usage/deletion/) for the full deletion workflow.
+
+## Performance
+
+The TUI is built on DuckDB querying Parquet metadata exports, not the raw SQLite database. This architecture delivers aggregate queries (top senders, domains, labels, time series) **hundreds of times faster** than equivalent SQLite JOINs. The Parquet analytics layer has a small footprint, so drill-down and re-aggregation feel instant even on very large archives.
+
+See [Data Storage](/architecture/storage/) for details on how this works.

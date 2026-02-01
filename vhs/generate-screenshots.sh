@@ -44,7 +44,7 @@ tmux new-session -d -s "$SESSION" -x 120 -y 40
 echo "==> TUI screenshots"
 
 send "MSGVAULT_HOME=/data msgvault tui" Enter
-wait_until "Sender"
+wait_until "Sender Name"
 
 # 1. Senders view (default)
 sleep 0.5
@@ -85,17 +85,18 @@ send Escape
 sleep 1
 
 # --- Search screenshots (at top-level Senders) ---
+wait_until "Sender Name"
 
 # Search for a sender
 send "/"
 sleep 0.5
-send "benson"
-sleep 1
+send -l "benson"
+sleep 1.5
+wait_until "benson"
 capture "tui-search-sender"
 
 # Drill into the benson result
 send Enter
-sleep 0.5
 wait_until "Date"
 sleep 0.5
 capture "tui-search-drilldown"
@@ -103,8 +104,9 @@ capture "tui-search-drilldown"
 # Search within the drilled-down messages
 send "/"
 sleep 0.5
-send "spring"
-sleep 1
+send -l "spring"
+sleep 1.5
+wait_until "spring"
 capture "tui-search-subject"
 
 # Clear search and return to top-level Senders
@@ -113,7 +115,9 @@ sleep 0.5
 send Escape
 sleep 0.5
 send Escape
-sleep 1
+sleep 0.5
+wait_until "Sender Name"
+sleep 0.5
 
 # 3. Domains view (cycle: Sender -> Recipient -> Domain)
 send "g"
@@ -148,7 +152,7 @@ capture "tui-time-yearly"
 
 # 6. Multi-row selection (back to Sender first)
 send "g"
-wait_until "Sender"
+wait_until "Sender Name"
 sleep 0.5
 send Down
 sleep 0.3

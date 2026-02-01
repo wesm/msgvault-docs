@@ -85,6 +85,7 @@ export default defineConfig({
         },
         { label: 'Troubleshooting', slug: 'troubleshooting' },
         { label: 'Development', slug: 'development' },
+        { label: 'FAQ', slug: 'faq' },
       ],
     }),
   ],
