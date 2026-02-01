@@ -17,8 +17,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     ca-certificates \
     curl \
-    ttyd \
     && rm -rf /var/lib/apt/lists/*
+
+# Install ttyd from GitHub (not in Debian repos)
+ARG TARGETARCH
+RUN case "${TARGETARCH}" in \
+      arm64) TTYD_ARCH="aarch64" ;; \
+      *)     TTYD_ARCH="x86_64" ;; \
+    esac && \
+    curl -fsSL -o /usr/local/bin/ttyd \
+      "https://github.com/tsl0922/ttyd/releases/download/1.7.7/ttyd.${TTYD_ARCH}" && \
+    chmod +x /usr/local/bin/ttyd
 
 # Install MesloLGS Nerd Font for consistent glyph rendering
 RUN mkdir -p /usr/share/fonts/meslo && \
@@ -29,7 +38,6 @@ RUN mkdir -p /usr/share/fonts/meslo && \
     fc-cache -f
 
 # Install VHS (arch-aware)
-ARG TARGETARCH
 RUN VHS_VERSION="0.8.0" && \
     case "${TARGETARCH}" in \
       arm64) VHS_ARCH="arm64" ;; \
