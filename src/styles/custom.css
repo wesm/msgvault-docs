@@ -206,6 +206,24 @@ nav.sidebar span {
   font-size: 1rem !important;
 }
 
+/* Right TOC */
+starlight-toc a {
+  color: #e8e8e8 !important;
+  font-weight: 400 !important;
+}
+
+starlight-toc a:hover {
+  color: #ffffff !important;
+}
+
+starlight-toc a[aria-current="true"] {
+  color: #ffffff !important;
+  background: #2a2a2a;
+  font-weight: 400 !important;
+  padding: 0.15em 0.4em;
+  margin: -0.15em -0.4em;
+}
+
 /* Sidebar group labels */
 nav.sidebar .top-level > li > details > summary span,
 nav.sidebar .top-level > li > a span {
