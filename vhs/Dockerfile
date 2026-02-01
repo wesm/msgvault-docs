@@ -1,7 +1,7 @@
 # Stage 1: Build msgvault binary
-FROM golang:1.25-alpine AS builder
+FROM golang:1.25 AS builder
 
-RUN apk add --no-cache git make gcc musl-dev g++
+RUN apt-get update && apt-get install -y --no-install-recommends git make gcc g++ && rm -rf /var/lib/apt/lists/*
 
 COPY . /src
 WORKDIR /src
