@@ -1,11 +1,72 @@
 ---
 title: LLM Chat & MCP
-description: Query your email archive with natural language using the built-in chat REPL or expose it to AI assistants via MCP.
+description: Expose your email archive to AI assistants via MCP, or query it with the built-in chat REPL.
 ---
 
-Both the `chat` command and the `mcp` server operate on your **local, read-only archive**, not your live Gmail account. The AI cannot send emails, modify labels, delete messages, or access your Google credentials. You control when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface.
+Both the `mcp` server and the `chat` command operate on your **local, read-only archive**, not your live Gmail account. The AI cannot send emails, modify labels, delete messages, or access your Google credentials. You control when data enters the archive (via `sync-full` / `sync-incremental`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface.
 
-## LLM Chat
+## MCP Server
+
+The `mcp` command starts a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that exposes your email archive as a set of tools. This lets AI assistants like Claude Desktop search, read, and analyze your messages directly.
+
+### Claude Desktop Configuration
+
+Add the following to your Claude Desktop config file:
+
+- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
+
+```json
+{
+  "mcpServers": {
+    "msgvault": {
+      "command": "msgvault",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+If `msgvault` is not on your PATH, use the full path to the binary. Restart Claude Desktop after saving the config.
+
+### Available Tools
+
+The MCP server exposes the following tools to connected AI clients:
+
+| Tool | Description | Parameters |
+|---|---|---|
+| `search_messages` | Full-text search with Gmail-like query syntax | `query` (string), `max_results` (int, optional) |
+| `get_message` | Retrieve a single message by ID | `message_id` (int) |
+| `list_messages` | List messages with filters | `from` (string), `to` (string), `label` (string), `before` (date), `after` (date), `limit` (int) |
+| `get_stats` | Archive statistics | — |
+| `aggregate` | Run aggregate queries (top senders, domains, labels, time series) | `group_by` (string), `limit` (int), `account` (string, optional) |
+
+### Example Usage with Claude
+
+Once configured, you can ask Claude questions like:
+
+- *"Search my email for messages from alice@example.com about the project proposal"*
+- *"How many emails did I receive last month?"*
+- *"Show me the top 10 senders in my archive"*
+- *"Find all messages with attachments larger than 5MB"*
+
+Claude will automatically call the appropriate msgvault tools to retrieve and analyze your messages.
+
+### CLI Flags
+
+```bash
+# Start the MCP server (stdio transport)
+msgvault mcp
+
+# Force SQL retrieval for all searches
+msgvault mcp --force-sql
+```
+
+| Flag | Default | Description |
+|---|---|---|
+| `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
+
+## LLM Chat (Experimental)
 
 The `chat` command launches an interactive REPL that lets you ask natural-language questions about your email archive. It uses retrieval-augmented generation (RAG) to search your messages and synthesize answers. You can use a local model via Ollama or a cloud API like Anthropic or OpenAI.
 
@@ -119,66 +180,3 @@ msgvault chat> /quit
 ```
 
 Type `/quit` or press `Ctrl+D` to exit the REPL.
-
-## MCP Server
-
-The `mcp` command starts a [Model Context Protocol](https://modelcontextprotocol.io/) (MCP) server that exposes your email archive as a set of tools. This lets AI assistants like Claude Desktop search, read, and analyze your messages directly.
-
-### Launch
-
-```bash
-# Start the MCP server (stdio transport)
-msgvault mcp
-
-# Force SQL retrieval for all searches
-msgvault mcp --force-sql
-```
-
-### CLI Flags
-
-| Flag | Default | Description |
-|---|---|---|
-| `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
-
-### Claude Desktop Configuration
-
-Add the following to your Claude Desktop config file:
-
-- **macOS**: `~/Library/Application Support/Claude/claude_desktop_config.json`
-- **Windows**: `%APPDATA%\Claude\claude_desktop_config.json`
-
-```json
-{
-  "mcpServers": {
-    "msgvault": {
-      "command": "msgvault",
-      "args": ["mcp"]
-    }
-  }
-}
-```
-
-If `msgvault` is not on your PATH, use the full path to the binary.
-
-### Available Tools
-
-The MCP server exposes the following tools to connected AI clients:
-
-| Tool | Description | Parameters |
-|---|---|---|
-| `search_messages` | Full-text search with Gmail-like query syntax | `query` (string), `max_results` (int, optional) |
-| `get_message` | Retrieve a single message by ID | `message_id` (int) |
-| `list_messages` | List messages with filters | `from` (string), `to` (string), `label` (string), `before` (date), `after` (date), `limit` (int) |
-| `get_stats` | Archive statistics | — |
-| `aggregate` | Run aggregate queries (top senders, domains, labels, time series) | `group_by` (string), `limit` (int), `account` (string, optional) |
-
-### Example Usage with Claude
-
-Once configured, you can ask Claude questions like:
-
-- *"Search my email for messages from alice@example.com about the project proposal"*
-- *"How many emails did I receive last month?"*
-- *"Show me the top 10 senders in my archive"*
-- *"Find all messages with attachments larger than 5MB"*
-
-Claude will automatically call the appropriate msgvault tools to retrieve and analyze your messages.
