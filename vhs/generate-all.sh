@@ -67,7 +67,17 @@ if [[ "$SKIP_BUILD" == false ]]; then
     echo ""
 fi
 
-# --- Step 3: Record tapes ---
+# --- Step 3: Build analytics cache inside container ---
+echo "==> Building analytics cache..."
+docker run --rm \
+    -v "$DEMO_DATA_DIR:/data" \
+    -e "MSGVAULT_HOME=/data" \
+    --entrypoint msgvault \
+    "$IMAGE_NAME" \
+    build-cache --full-rebuild
+echo ""
+
+# --- Step 4: Record tapes ---
 mkdir -p "$OUTPUT_DIR"
 
 record_tape() {
@@ -82,8 +92,8 @@ record_tape() {
     echo "==> Recording: $tape_name"
     docker run --rm \
         -v "$TAPES_DIR:/tapes" \
-        -v "$DEMO_DATA_DIR:/root/.msgvault" \
-        -e "MSGVAULT_HOME=/root/.msgvault" \
+        -v "$DEMO_DATA_DIR:/data" \
+        -e "MSGVAULT_HOME=/data" \
         "$IMAGE_NAME" \
         "/tapes/${tape_name}.tape"
 
