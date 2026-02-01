@@ -1,0 +1,3 @@
+review_guidelines = """
+Do not flag missing redirects for removed or renamed pages. Redirects are not a priority right now.
+"""
