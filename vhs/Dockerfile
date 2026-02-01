@@ -1,5 +1,5 @@
 # Stage 1: Build msgvault binary
-FROM golang:1.25 AS builder
+FROM golang:1.25-bookworm AS builder
 
 RUN apt-get update && apt-get install -y --no-install-recommends git make gcc g++ && rm -rf /var/lib/apt/lists/*
 
@@ -57,6 +57,9 @@ RUN mv /usr/bin/chromium /usr/bin/chromium-real && \
 
 # Copy msgvault binary from builder
 COPY --from=builder /src/msgvault /usr/local/bin/msgvault
+
+# Verify binary runs
+RUN msgvault version
 
 WORKDIR /tapes
 ENTRYPOINT ["vhs"]
