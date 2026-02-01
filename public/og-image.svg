@@ -19,27 +19,26 @@
   <line x1="1180" y1="570" x2="1180" y2="610" stroke="#555555" stroke-width="2"/>
   <line x1="1140" y1="610" x2="1180" y2="610" stroke="#555555" stroke-width="2"/>
 
-  <!-- Vault icon (left side) -->
-  <g transform="translate(160, 190)">
-    <rect x="0" y="0" width="120" height="120" fill="none" stroke="#e8e8e8" stroke-width="3"/>
-    <rect x="10" y="10" width="100" height="100" fill="none" stroke="#2a2a2a" stroke-width="1.5"/>
-    <circle cx="60" cy="60" r="32" fill="none" stroke="#e8e8e8" stroke-width="2"/>
-    <line x1="60" y1="32" x2="60" y2="88" stroke="#555555" stroke-width="2"/>
-    <line x1="32" y1="60" x2="88" y2="60" stroke="#555555" stroke-width="2"/>
-    <!-- Corner bolts -->
-    <rect x="14" y="14" width="6" height="6" fill="#555555"/>
-    <rect x="100" y="14" width="6" height="6" fill="#555555"/>
-    <rect x="14" y="100" width="6" height="6" fill="#555555"/>
-    <rect x="100" y="100" width="6" height="6" fill="#555555"/>
-    <!-- Center -->
-    <circle cx="60" cy="60" r="4" fill="#e8e8e8"/>
+  <!-- Envelope + lock icon (scaled from favicon) -->
+  <g transform="translate(130, 185) scale(4.2)">
+    <!-- Envelope body -->
+    <rect x="2" y="7" width="28" height="20" rx="2" fill="#0a0a0a" stroke="#e8e8e8" stroke-width="1.5"/>
+    <!-- Envelope flap (V shape) -->
+    <polyline points="2,7 16,18 30,7" fill="none" stroke="#e8e8e8" stroke-width="1.5" stroke-linejoin="round"/>
+    <!-- Lock body -->
+    <rect x="11" y="15" width="10" height="8" rx="1.5" fill="#e8e8e8"/>
+    <!-- Lock shackle -->
+    <path d="M13.5,15 V12 a2.5,2.5 0 0 1 5,0 V15" fill="none" stroke="#e8e8e8" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Keyhole -->
+    <circle cx="16" cy="19.5" r="1.5" fill="#0a0a0a"/>
+    <rect x="15.25" y="20" width="1.5" height="2" rx="0.5" fill="#0a0a0a"/>
   </g>
 
   <!-- Title -->
   <text x="340" y="245" fill="#ffffff" font-size="72" font-weight="700" letter-spacing="-0.03em">msgvault</text>
 
   <!-- Tagline -->
-  <text x="340" y="295" fill="#888888" font-size="24" font-weight="400">Your email archive. Offline. Secure. Fast.</text>
+  <text x="340" y="295" fill="#888888" font-size="24" font-weight="400">Your offline email and chat archive. Secure. Fast.</text>
 
   <!-- Feature pills -->
   <g transform="translate(340, 330)">
