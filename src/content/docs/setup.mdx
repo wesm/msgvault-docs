@@ -21,7 +21,7 @@ msgvault --help
 
 ## Build From Source
 
-Requires Go 1.21+ and a C compiler (GCC or Clang). CGO is required because msgvault uses `mattn/go-sqlite3` which compiles SQLite as a C extension for full-text search (FTS5).
+Requires Go 1.25+ and a C/C++ compiler (GCC or Clang). CGO is required because msgvault uses `mattn/go-sqlite3` (SQLite with FTS5) and `go-duckdb` (Parquet analytics), both of which compile native extensions.
 
 ```bash
 git clone https://github.com/wesm/msgvault.git

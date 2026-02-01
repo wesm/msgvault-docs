@@ -100,8 +100,11 @@ html {
 }
 
 .expressive-code .header {
-  background: #1a1a1a !important;
-  border-bottom: 1px solid #2a2a2a !important;
+  display: none !important;
+}
+
+.expressive-code .copy {
+  top: calc(1px + var(--ec-uiPadBlk, 0.4rem)) !important;
 }
 
 /* Inline code */
@@ -167,13 +170,21 @@ tr:nth-child(even) {
 
 /* Links */
 a {
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
   transition: color 0.15s ease;
 }
 
 a:hover {
   color: #ffffff !important;
-  text-decoration: underline;
+}
+
+/* No underline for nav/sidebar/button links */
+nav a,
+.hero a,
+a.button,
+a[class*="card"] {
+  text-decoration: none;
 }
 
 /* Sidebar */

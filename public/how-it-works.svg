@@ -101,6 +101,6 @@
   <!-- MCP Server box -->
   <rect x="430" y="460" width="200" height="50" class="box" rx="0"/>
   <text x="530" y="489" text-anchor="middle" class="label">MCP Server</text>
-  <text x="530" y="504" text-anchor="middle" class="sublabel">Claude Desktop</text>
+  <text x="530" y="504" text-anchor="middle" class="sublabel">Agent UIs</text>
 
 </svg>
