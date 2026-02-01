@@ -77,7 +77,7 @@ ATTACHMENT_TYPES = [
 
 DATE_START = datetime.datetime(2022, 1, 1, tzinfo=datetime.timezone.utc)
 DATE_END = datetime.datetime(2024, 12, 31, tzinfo=datetime.timezone.utc)
-TARGET_MESSAGES = 500
+TARGET_MESSAGES = 10000
 
 
 def load_schema(conn: sqlite3.Connection) -> None:
@@ -304,7 +304,13 @@ def get_or_create_participant(conn: sqlite3.Connection, email: str, name: str | 
         "INSERT INTO participants (email_address, display_name, domain) VALUES (?, ?, ?)",
         (email, name or fake.name(), domain),
     )
-    return conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    pid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+    conn.execute(
+        "INSERT OR IGNORE INTO participant_identifiers (participant_id, identifier_type, identifier_value, display_value, is_primary) "
+        "VALUES (?, 'email', ?, ?, TRUE)",
+        (pid, email.lower(), email),
+    )
+    return pid
 
 
 def generate_contacts(conn: sqlite3.Connection, count: int = 80) -> list[int]:
@@ -383,9 +389,9 @@ def populate(conn: sqlite3.Connection) -> None:
         subject = fake.sentence(nb_words=random.randint(3, 10)).rstrip(".")
         body = "\n\n".join(fake.paragraphs(nb=random.randint(1, 4)))
         snippet = body[:100]
-        has_attach = random.random() < 0.2
+        has_attach = random.random() < 0.05
         num_attach = random.randint(1, 3) if has_attach else 0
-        size = random.randint(1000, 500000) if not has_attach else random.randint(50000, 5000000)
+        size = random.randint(1000, 500000) if not has_attach else random.randint(10000, 500000)
 
         conn.execute(
             "INSERT INTO messages (conversation_id, source_id, source_message_id, message_type, "
@@ -403,7 +409,11 @@ def populate(conn: sqlite3.Connection) -> None:
             (msg_id, body),
         )
 
-        # Recipients
+        # Recipients: 'from' row for the sender, 'to' row for the recipient
+        conn.execute(
+            "INSERT INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'from')",
+            (msg_id, sender_id),
+        )
         conn.execute(
             "INSERT INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'to')",
             (msg_id, recipient_id),
@@ -449,7 +459,7 @@ def populate(conn: sqlite3.Connection) -> None:
         if has_attach:
             for _ in range(num_attach):
                 fname, mtype = random.choice(ATTACHMENT_TYPES)
-                asize = random.randint(10000, 2000000)
+                asize = random.randint(5000, 300000)
                 chash = hashlib.sha256(f"{msg_id}_{fname}_{random.random()}".encode()).hexdigest()
                 spath = f"{chash[:2]}/{chash}"
                 conn.execute(
@@ -457,6 +467,19 @@ def populate(conn: sqlite3.Connection) -> None:
                     "VALUES (?, ?, ?, ?, ?, ?)",
                     (msg_id, fname, mtype, asize, chash, spath),
                 )
+
+    # Populate conversation_participants from messages + recipients
+    conn.execute("""
+        INSERT OR IGNORE INTO conversation_participants (conversation_id, participant_id, role)
+        SELECT DISTINCT m.conversation_id, m.sender_id, 'member'
+        FROM messages m WHERE m.sender_id IS NOT NULL
+    """)
+    conn.execute("""
+        INSERT OR IGNORE INTO conversation_participants (conversation_id, participant_id, role)
+        SELECT DISTINCT m.conversation_id, mr.participant_id, 'member'
+        FROM messages m
+        JOIN message_recipients mr ON m.id = mr.message_id
+    """)
 
     # Populate FTS from message_bodies
     conn.execute("""

@@ -35,8 +35,8 @@ RUN FREEZE_VERSION="0.2.2" && \
     esac && \
     curl -fsSL "https://github.com/charmbracelet/freeze/releases/download/v${FREEZE_VERSION}/freeze_${FREEZE_VERSION}_Linux_${FREEZE_ARCH}.tar.gz" \
       | tar -xz -C /tmp && \
-    mv /tmp/freeze /usr/local/bin/freeze && \
-    rm -rf /tmp/freeze* && \
+    mv /tmp/freeze_*/freeze /usr/local/bin/freeze && \
+    rm -rf /tmp/freeze_* && \
     freeze --version
 
 # Copy msgvault binary from builder

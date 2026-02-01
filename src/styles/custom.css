@@ -305,9 +305,45 @@ button, .button {
   font-size: 1.15rem;
 }
 
-/* Hero */
+/* Hero - side by side layout */
 .hero {
   background: linear-gradient(180deg, #0f0f0f 0%, #0a0a0a 100%);
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  align-items: center !important;
+  gap: 2rem !important;
+}
+
+/* Hero text content */
+.hero > .stack {
+  order: 1;
+}
+
+/* Hero image container (html mode) */
+.hero > .hero-html {
+  order: 2;
+  width: 100% !important;
+  max-width: none !important;
+  align-self: center;
+}
+
+/* Hero image: fill container */
+.hero > .hero-html img {
+  display: block !important;
+  width: 100% !important;
+  height: auto !important;
+  max-width: none !important;
+  border-radius: 4px;
+}
+
+/* Reduce gap between hero and content on desktop */
+.hero + .sl-markdown-content {
+  margin-top: -2.5rem !important;
+}
+
+.content-panel:has(.hero) {
+  padding-bottom: 0 !important;
+  margin-bottom: -2rem !important;
 }
 
 /* Focus states */
@@ -316,9 +352,28 @@ button, .button {
   outline-offset: 2px;
 }
 
-/* Mobile nav */
+/* Mobile */
 @media (max-width: 50rem) {
   nav.sidebar {
     background: #0a0a0a !important;
+  }
+
+  .hero {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .hero > .hero-html,
+  .hero > img {
+    max-width: 100% !important;
+    margin-bottom: 2rem !important;
+  }
+
+  .hero + .sl-markdown-content {
+    margin-top: 0 !important;
+  }
+
+  .content-panel:has(.hero) {
+    margin-bottom: 0 !important;
   }
 }

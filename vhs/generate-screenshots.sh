@@ -20,8 +20,19 @@ send() {
     tmux send-keys -t "$SESSION" "$@"
 }
 
-wait_for() {
-    sleep "${1:-1}"
+# Helper: poll tmux pane (plain text, no ANSI) until a pattern appears (or timeout)
+wait_until() {
+    local pattern="$1"
+    local timeout="${2:-30}"
+    local elapsed=0
+    while ! tmux capture-pane -pt "$SESSION" | grep -q "$pattern"; do
+        sleep 0.5
+        elapsed=$((elapsed + 1))
+        if [[ $elapsed -ge $((timeout * 2)) ]]; then
+            echo "  WARNING: timed out waiting for pattern: $pattern"
+            return 1
+        fi
+    done
 }
 
 # --- Start tmux session ---
@@ -33,77 +44,95 @@ tmux new-session -d -s "$SESSION" -x 120 -y 40
 echo "==> TUI screenshots"
 
 send "MSGVAULT_HOME=/data msgvault tui" Enter
-wait_for 5
+wait_until "Sender"
 
 # 1. Senders view (default)
+sleep 0.5
 capture "tui-senders"
 
 # 2. Drill into a sender
 send Down
-wait_for 0.2
+sleep 0.3
 send Down
-wait_for 0.2
+sleep 0.3
 send Down
-wait_for 0.2
+sleep 0.3
 send Enter
-wait_for 2
+wait_until "Date"
+sleep 0.5
 capture "tui-drilldown"
 
 # Navigate back
 send Escape
-wait_for 1
+sleep 1
 
-# 3. Domains view (cycle: Senders -> Recipients -> Domains)
+# 3. Domains view (cycle: Sender -> Recipient -> Domain)
 send "g"
-wait_for 0.5
+wait_until "Recipient"
 send "g"
-wait_for 1.5
+wait_until "Domain"
+sleep 0.5
 capture "tui-domains"
 
 # 4. Labels view
 send "g"
-wait_for 1.5
+wait_until "Label"
+sleep 0.5
 capture "tui-labels"
 
 # 5. Time view
 send "g"
-wait_for 1.5
+wait_until "Time"
+sleep 0.5
 capture "tui-time"
 
-# 6. Multi-row selection (back to Senders first)
+# 6. Multi-row selection (back to Sender first)
 send "g"
-wait_for 1
+wait_until "Sender"
+sleep 0.5
 send Down
-wait_for 0.2
+sleep 0.3
 send Space
-wait_for 0.2
+sleep 0.3
 send Down
-wait_for 0.2
+sleep 0.3
 send Space
-wait_for 0.2
+sleep 0.3
 send Down
-wait_for 0.2
+sleep 0.3
 send Space
-wait_for 0.5
+sleep 0.5
 capture "tui-selection"
 
 # Quit TUI
 send "q"
-wait_for 1
+sleep 1
 
 # =====================
 # CLI Screenshots
 # =====================
 echo "==> CLI screenshots"
 
+# Set up a clean prompt and export MSGVAULT_HOME so it doesn't appear in commands
+send "export PS1='$ '" Enter
+sleep 0.3
+send "export MSGVAULT_HOME=/data" Enter
+sleep 0.3
+send "clear" Enter
+sleep 0.5
+
 # 7. stats
-send "MSGVAULT_HOME=/data msgvault stats" Enter
-wait_for 2
+send "msgvault stats" Enter
+wait_until "Database:"
+sleep 0.5
 capture "stats"
 
 # 8. list-senders
-send "MSGVAULT_HOME=/data msgvault list-senders --limit 15" Enter
-wait_for 2
+send "clear" Enter
+sleep 0.5
+send "msgvault list-senders --limit 15" Enter
+wait_until "SENDER"
+sleep 0.5
 capture "list-senders"
 
 # Cleanup

@@ -1,10 +1,10 @@
 ---
 title: msgvault
 description: Offline Gmail archive with full-text search, interactive TUI, and multi-account support.
-template: splash
+template: doc
 hero:
   image:
-    file: ../../../public/favicon.svg
+    html: <img src="/tui-senders.svg" alt="msgvault TUI showing the Senders view" />
   tagline: Archive a lifetime of email and chat. Analytics and search in milliseconds. Query with AI, entirely offline.
   actions:
     - text: Quick Start
@@ -18,7 +18,7 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-<img src="/tui-senders.svg" alt="msgvault TUI showing the Senders view" style="width: 100%; max-width: 960px; margin: 0 auto 1.5rem; display: block; border-radius: 8px;" />
+Currently supports Gmail, with WhatsApp and other messaging platforms planned.
 
 ## Install
 
@@ -31,7 +31,7 @@ Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/quick
 
 ## Why msgvault?
 
-Your email is yours. msgvault downloads a complete local copy of your Gmail (every message, every attachment, every label) then everything runs offline against that archive. Search, analytics, the TUI, LLM chat, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
+Your email and other message data is yours. msgvault downloads a complete local copy of your Gmail (every message, every attachment, every label) then everything runs offline against that archive. Search, analytics, the TUI, LLM chat, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
 
 Years of PDFs, photos, documents, and spreadsheets buried in your inbox become ordinary files on your filesystem, deduplicated and instantly searchable. Your data is no longer locked behind a web interface or an API. It's just files on disk that you own and control.
 
