@@ -21,12 +21,14 @@ The TUI automatically builds or updates the Parquet analytics cache on launch wh
 
 ## View Modes
 
-The TUI provides five aggregate view modes. Press `g` to cycle through them:
+The TUI provides seven aggregate view modes. Press `g` to cycle through them:
 
 | View | Description |
 |---|---|
 | Senders | Aggregate by sender email address |
-| Recipients | Aggregate by recipient |
+| Sender Names | Aggregate by sender display name (falls back to email when no name is set) |
+| Recipients | Aggregate by recipient email address |
+| Recipient Names | Aggregate by recipient display name (falls back to email when no name is set) |
 | Domains | Aggregate by sender domain |
 | Labels | Aggregate by Gmail label |
 | Time | Aggregate by time period (year/month/day) |
@@ -35,7 +37,7 @@ The TUI provides five aggregate view modes. Press `g` to cycle through them:
 
 ### Time View
 
-The Time view aggregates messages by time period. Press `t` to cycle between monthly, daily, and yearly granularity:
+Press `t` from any view to jump directly to the Time view. The Time view aggregates messages by time period. When already in Time view, pressing `t` cycles between monthly, daily, and yearly granularity:
 
 <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
   <figure style="margin: 0; text-align: center;" data-lightbox>
@@ -58,7 +60,7 @@ Press `Enter` to drill into any row. For example, selecting a sender shows their
 
 <Screenshot src="/tui-drilldown.svg" alt="msgvault TUI drill-down showing messages from a specific sender" />
 
-From a drill-down view, press `g` to re-aggregate the filtered messages by a different dimension. You can think of this like an interactive pivot table. The cycle skips the dimension you drilled into, so drilling into a sender and pressing `g` cycles through Recipients, Domains, Labels, and Time.
+From a drill-down view, press `g` to re-aggregate the filtered messages by a different dimension. You can think of this like an interactive pivot table. The cycle skips the dimension you drilled into — and when drilling from an email address view (Senders or Recipients), it also skips the corresponding name view since it would be redundant. For example, drilling into a sender and pressing `g` cycles through Recipients, Recipient Names, Domains, Labels, and Time.
 
 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
   <figure style="margin: 0; text-align: center;" data-lightbox>
@@ -94,7 +96,7 @@ Search also works after drill-down. Drill into a result, then press `/` again to
 | `g` | Cycle view mode |
 | `s` | Cycle sort field (Name / Count / Size) |
 | `r` | Reverse sort direction |
-| `t` | Cycle time granularity (Year / Month / Day) |
+| `t` | Jump to Time view (cycle granularity when already in Time) |
 | `a` | Filter by account |
 | `f` | Filter by attachments |
 | `Space` | Toggle selection |

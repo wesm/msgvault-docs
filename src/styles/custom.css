@@ -330,11 +330,11 @@ button, .button {
 
 /* Splash page body text */
 [data-has-hero] .sl-markdown-content {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
 }
 
 [data-has-hero] .card .body {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
 }
 
 /* Hero - side by side layout */

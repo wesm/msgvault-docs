@@ -100,6 +100,9 @@ send "/"
 sleep 0.5
 send -l "benson"
 sleep 1.5
+# Enter to confirm/fix the search
+send Enter
+sleep 0.5
 wait_until "benson"
 capture "tui-search-sender"
 
