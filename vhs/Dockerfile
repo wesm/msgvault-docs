@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fontconfig \
     ca-certificates \
     curl \
+    ttyd \
     && rm -rf /var/lib/apt/lists/*
 
 # Install MesloLGS Nerd Font for consistent glyph rendering
