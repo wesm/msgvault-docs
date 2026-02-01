@@ -80,11 +80,22 @@ wait_until "Label"
 sleep 0.5
 capture "tui-labels"
 
-# 5. Time view
+# 5. Time view - capture all three granularities
 send "g"
 wait_until "Time"
 sleep 0.5
-capture "tui-time"
+# Default is monthly
+capture "tui-time-monthly"
+
+# Cycle to daily
+send "t"
+sleep 0.5
+capture "tui-time-daily"
+
+# Cycle to yearly
+send "t"
+sleep 0.5
+capture "tui-time-yearly"
 
 # 6. Multi-row selection (back to Sender first)
 send "g"
