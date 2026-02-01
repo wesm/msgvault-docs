@@ -8,7 +8,7 @@ WORKDIR /src
 RUN make build
 
 # Stage 2: VHS recording runtime (Debian to match glibc builder)
-FROM debian:bookworm-slim
+FROM debian:trixie-slim
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
