@@ -24,8 +24,9 @@ function initLightbox() {
       var img = el.querySelector('img');
       if (!img || el.dataset.lightboxBound) return;
       el.dataset.lightboxBound = '1';
-      el.style.cursor = 'zoom-in';
-      el.addEventListener('click', function () {
+      img.style.cursor = 'zoom-in';
+      img.addEventListener('click', function (e) {
+        e.stopPropagation();
         var overlayImg = overlay.querySelector('img');
         overlayImg.src = img.src;
         overlayImg.alt = img.alt;

@@ -170,8 +170,6 @@ tr:nth-child(even) {
 
 /* Links */
 a {
-  text-decoration: underline;
-  text-underline-offset: 0.15em;
   transition: color 0.15s ease;
 }
 
@@ -179,11 +177,16 @@ a:hover {
   color: #ffffff !important;
 }
 
-/* No underline for nav/sidebar/button links */
-nav a,
-.hero a,
-a.button,
-a[class*="card"] {
+/* Underline only content area links */
+.sl-markdown-content a {
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+/* No underline for button/card links within content */
+.sl-markdown-content a.button,
+.sl-markdown-content a[class*="card"],
+.hero a {
   text-decoration: none;
 }
 

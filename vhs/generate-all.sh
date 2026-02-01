@@ -34,11 +34,12 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-REPO="$(cd "$REPO" 2>/dev/null && pwd)" || {
+REPO_RESOLVED="$(cd "$REPO" 2>/dev/null && pwd)" || {
     echo "Error: msgvault repo not found at $REPO"
     echo "Pass --repo PATH or set MSGVAULT_REPO."
     exit 1
 }
+REPO="$REPO_RESOLVED"
 
 # --- Step 1: Generate demo data ---
 if [[ "$SKIP_DATA" == false ]]; then

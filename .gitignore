@@ -6,3 +6,4 @@ dist/
 .DS_Store
 
 vhs/demo-data
+vhs/tapes/output/

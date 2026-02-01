@@ -4,6 +4,41 @@
       "source": "/install.sh",
       "destination": "https://raw.githubusercontent.com/wesm/msgvault/main/scripts/install.sh",
       "permanent": false
+    },
+    {
+      "source": "/guides/deletion/",
+      "destination": "/usage/deletion/",
+      "permanent": true
+    },
+    {
+      "source": "/quickstart/",
+      "destination": "/setup/",
+      "permanent": true
+    },
+    {
+      "source": "/installation/",
+      "destination": "/setup/#build-from-source",
+      "permanent": true
+    },
+    {
+      "source": "/guides/parquet/",
+      "destination": "/architecture/storage/",
+      "permanent": true
+    },
+    {
+      "source": "/architecture/schema/",
+      "destination": "/architecture/storage/",
+      "permanent": true
+    },
+    {
+      "source": "/usage/mcp-server/",
+      "destination": "/usage/chat/",
+      "permanent": true
+    },
+    {
+      "source": "/guides/headless/",
+      "destination": "/guides/oauth-setup/#headless-server-setup",
+      "permanent": true
     }
   ]
 }

@@ -15,7 +15,6 @@ import hashlib
 import os
 import random
 import sqlite3
-import subprocess
 import sys
 from pathlib import Path
 
@@ -97,7 +96,7 @@ def load_schema(conn: sqlite3.Connection) -> None:
                 CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
                     subject,
                     body_text,
-                    content='messages',
+                    content='',
                     content_rowid='id'
                 );
             """)
@@ -194,6 +193,23 @@ def _create_embedded_schema(conn: sqlite3.Connection) -> None:
             body_html TEXT
         );
 
+        CREATE TABLE IF NOT EXISTS participant_identifiers (
+            id INTEGER PRIMARY KEY,
+            participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+            identifier_type TEXT NOT NULL,
+            identifier_value TEXT NOT NULL,
+            display_value TEXT,
+            is_primary BOOLEAN DEFAULT FALSE,
+            UNIQUE(participant_id, identifier_type, identifier_value)
+        );
+
+        CREATE TABLE IF NOT EXISTS conversation_participants (
+            conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+            participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+            role TEXT NOT NULL DEFAULT 'member',
+            PRIMARY KEY (conversation_id, participant_id)
+        );
+
         CREATE TABLE IF NOT EXISTS message_recipients (
             id INTEGER PRIMARY KEY,
             message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
@@ -280,7 +296,7 @@ def _create_embedded_schema(conn: sqlite3.Connection) -> None:
         CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
             subject,
             body_text,
-            content='messages',
+            content='',
             content_rowid='id'
         );
     """)
@@ -298,13 +314,14 @@ def random_date() -> datetime.datetime:
 def get_or_create_participant(conn: sqlite3.Connection, email: str, name: str | None = None) -> int:
     row = conn.execute("SELECT id FROM participants WHERE email_address = ?", (email,)).fetchone()
     if row:
-        return row[0]
-    domain = email.split("@")[1] if "@" in email else ""
-    conn.execute(
-        "INSERT INTO participants (email_address, display_name, domain) VALUES (?, ?, ?)",
-        (email, name or fake.name(), domain),
-    )
-    pid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+        pid = row[0]
+    else:
+        domain = email.split("@")[1] if "@" in email else ""
+        conn.execute(
+            "INSERT INTO participants (email_address, display_name, domain) VALUES (?, ?, ?)",
+            (email, name or fake.name(), domain),
+        )
+        pid = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
     conn.execute(
         "INSERT OR IGNORE INTO participant_identifiers (participant_id, identifier_type, identifier_value, display_value, is_primary) "
         "VALUES (?, 'email', ?, ?, TRUE)",
