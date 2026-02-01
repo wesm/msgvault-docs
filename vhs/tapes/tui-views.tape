@@ -5,7 +5,7 @@ Set Theme "UltraDark"
 Set FontFamily "MesloLGS NF"
 Set FontSize 14
 Set Width 1000
-Set Height 1000
+Set Height 800
 Set Framerate 25
 
 Type "msgvault tui"

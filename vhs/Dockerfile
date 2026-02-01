@@ -22,7 +22,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Build ttyd from source (not in Debian repos, prebuilt binaries need newer glibc)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    cmake g++ pkg-config libwebsockets-dev libjson-c-dev libssl-dev \
+    cmake make gcc g++ pkg-config libwebsockets-dev libjson-c-dev libssl-dev \
     && git clone --depth 1 --branch 1.7.7 https://github.com/tsl0922/ttyd.git /tmp/ttyd \
     && cd /tmp/ttyd && mkdir build && cd build \
     && cmake -DCMAKE_BUILD_TYPE=Release .. && make -j$(nproc) \
