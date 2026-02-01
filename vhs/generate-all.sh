@@ -97,13 +97,18 @@ record_tape() {
         "$IMAGE_NAME" \
         "/tapes/${tape_name}.tape"
 
-    # Copy output
-    local output_file="$TAPES_DIR/output/${tape_name}.webm"
-    if [[ -f "$output_file" ]]; then
-        cp "$output_file" "$OUTPUT_DIR/${tape_name}.webm"
-        echo "  -> $OUTPUT_DIR/${tape_name}.webm"
-    else
-        echo "  Warning: expected output not found: $output_file"
+    # Copy output (videos and screenshots)
+    local output_dir="$TAPES_DIR/output"
+    local found=false
+    for f in "$output_dir"/*.webm "$output_dir"/*.png "$output_dir"/*.svg; do
+        if [[ -f "$f" ]]; then
+            cp "$f" "$OUTPUT_DIR/"
+            echo "  -> $OUTPUT_DIR/$(basename "$f")"
+            found=true
+        fi
+    done
+    if [[ "$found" == false ]]; then
+        echo "  Warning: no output files found in $output_dir"
     fi
 }
 
@@ -117,4 +122,4 @@ else
 fi
 
 echo ""
-echo "Done! Videos are in $OUTPUT_DIR"
+echo "Done! Output files are in $OUTPUT_DIR"
