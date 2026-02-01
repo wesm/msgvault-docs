@@ -35,7 +35,9 @@ RUN VHS_VERSION="0.8.0" && \
       *)     VHS_ARCH="x86_64" ;; \
     esac && \
     curl -fsSL "https://github.com/charmbracelet/vhs/releases/download/v${VHS_VERSION}/vhs_${VHS_VERSION}_Linux_${VHS_ARCH}.tar.gz" \
-      | tar -xz -C /usr/local/bin vhs
+      | tar -xz -C /tmp && \
+    mv /tmp/vhs_*/vhs /usr/local/bin/vhs && \
+    rm -rf /tmp/vhs_*
 
 # Chromium no-sandbox wrapper (required in Docker)
 RUN mv /usr/bin/chromium-browser /usr/bin/chromium-browser-real && \
