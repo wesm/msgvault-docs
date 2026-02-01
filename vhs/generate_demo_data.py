@@ -2,29 +2,32 @@
 # requires-python = ">=3.11"
 # dependencies = [
 #     "faker>=28.0",
-#     "pyarrow>=17.0",
 # ]
 # ///
-"""Generate a synthetic msgvault SQLite database and Parquet analytics cache for TUI demos."""
+"""Generate a synthetic msgvault SQLite database for TUI demos.
+
+The Parquet analytics cache is built separately by running
+`msgvault build-cache --full-rebuild` against this database.
+"""
 
 import datetime
 import hashlib
 import os
 import random
 import sqlite3
+import subprocess
+import sys
 from pathlib import Path
 
-import pyarrow as pa
-import pyarrow.parquet as pq
 from faker import Faker
 
 fake = Faker()
 Faker.seed(42)
 random.seed(42)
 
-OUTPUT_DIR = Path(__file__).parent / "demo-data"
+SCRIPT_DIR = Path(__file__).parent
+OUTPUT_DIR = SCRIPT_DIR / "demo-data"
 DB_PATH = OUTPUT_DIR / "msgvault.db"
-ANALYTICS_DIR = OUTPUT_DIR / "analytics" / "messages"
 
 # --- Configuration ---
 
@@ -77,80 +80,204 @@ DATE_END = datetime.datetime(2024, 12, 31, tzinfo=datetime.timezone.utc)
 TARGET_MESSAGES = 500
 
 
-def create_schema(conn: sqlite3.Connection) -> None:
+def load_schema(conn: sqlite3.Connection) -> None:
+    """Load schema from msgvault source repo if available, otherwise use embedded schema."""
+    # Try to find the schema in a sibling msgvault repo
+    schema_paths = [
+        SCRIPT_DIR / "../../msgvault/internal/store/schema.sql",
+        Path(os.environ.get("MSGVAULT_REPO", "")) / "internal/store/schema.sql",
+    ]
+    for p in schema_paths:
+        resolved = p.resolve()
+        if resolved.exists():
+            print(f"  Using schema from {resolved}")
+            conn.executescript(resolved.read_text())
+            # Add FTS table (not in the main schema file)
+            conn.executescript("""
+                CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
+                    subject,
+                    body_text,
+                    content='messages',
+                    content_rowid='id'
+                );
+            """)
+            return
+
+    print("  Warning: msgvault schema.sql not found, using embedded schema", file=sys.stderr)
+    _create_embedded_schema(conn)
+
+
+def _create_embedded_schema(conn: sqlite3.Connection) -> None:
+    """Fallback embedded schema matching msgvault's current schema."""
     conn.executescript("""
-        CREATE TABLE sources (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            source_type TEXT NOT NULL DEFAULT 'gmail',
+        CREATE TABLE IF NOT EXISTS sources (
+            id INTEGER PRIMARY KEY,
+            source_type TEXT NOT NULL,
             identifier TEXT NOT NULL,
             display_name TEXT,
+            google_user_id TEXT UNIQUE,
+            last_sync_at DATETIME,
             sync_cursor TEXT,
-            last_sync_at DATETIME
+            sync_config JSON,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(source_type, identifier)
         );
 
-        CREATE TABLE conversations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            source_id INTEGER NOT NULL REFERENCES sources(id),
-            source_conversation_id TEXT NOT NULL,
-            conversation_type TEXT NOT NULL DEFAULT 'email_thread',
-            message_count INTEGER DEFAULT 0,
-            last_message_at DATETIME
-        );
-
-        CREATE TABLE participants (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email_address TEXT NOT NULL,
+        CREATE TABLE IF NOT EXISTS participants (
+            id INTEGER PRIMARY KEY,
+            email_address TEXT,
+            phone_number TEXT,
             display_name TEXT,
-            domain TEXT
+            domain TEXT,
+            canonical_id TEXT,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
-        CREATE UNIQUE INDEX idx_participants_email ON participants(email_address);
+        CREATE UNIQUE INDEX IF NOT EXISTS idx_participants_email ON participants(email_address)
+            WHERE email_address IS NOT NULL;
 
-        CREATE TABLE messages (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            conversation_id INTEGER NOT NULL REFERENCES conversations(id),
-            source_id INTEGER NOT NULL REFERENCES sources(id),
-            source_message_id TEXT NOT NULL,
-            message_type TEXT NOT NULL DEFAULT 'email',
-            sent_at DATETIME NOT NULL,
+        CREATE TABLE IF NOT EXISTS conversations (
+            id INTEGER PRIMARY KEY,
+            source_id INTEGER NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+            source_conversation_id TEXT,
+            conversation_type TEXT NOT NULL,
+            title TEXT,
+            participant_count INTEGER DEFAULT 0,
+            message_count INTEGER DEFAULT 0,
+            unread_count INTEGER DEFAULT 0,
+            last_message_at DATETIME,
+            last_message_preview TEXT,
+            metadata JSON,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(source_id, source_conversation_id)
+        );
+
+        CREATE TABLE IF NOT EXISTS messages (
+            id INTEGER PRIMARY KEY,
+            conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+            source_id INTEGER NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+            source_message_id TEXT,
+            message_type TEXT NOT NULL,
+            sent_at DATETIME,
+            received_at DATETIME,
+            read_at DATETIME,
+            delivered_at DATETIME,
+            internal_date DATETIME,
             sender_id INTEGER REFERENCES participants(id),
+            is_from_me BOOLEAN DEFAULT FALSE,
             subject TEXT,
-            body_text TEXT,
             snippet TEXT,
+            reply_to_message_id INTEGER REFERENCES messages(id),
+            thread_position INTEGER,
+            is_read BOOLEAN DEFAULT TRUE,
+            is_delivered BOOLEAN,
+            is_sent BOOLEAN DEFAULT TRUE,
+            is_edited BOOLEAN DEFAULT FALSE,
+            is_forwarded BOOLEAN DEFAULT FALSE,
             size_estimate INTEGER,
-            has_attachments BOOLEAN DEFAULT 0,
-            deleted_at DATETIME
+            has_attachments BOOLEAN DEFAULT FALSE,
+            attachment_count INTEGER DEFAULT 0,
+            deleted_at DATETIME,
+            deleted_from_source_at DATETIME,
+            delete_batch_id TEXT,
+            archived_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            indexing_version INTEGER DEFAULT 1,
+            metadata JSON,
+            UNIQUE(source_id, source_message_id)
         );
 
-        CREATE TABLE message_recipients (
-            message_id INTEGER NOT NULL REFERENCES messages(id),
-            participant_id INTEGER NOT NULL REFERENCES participants(id),
-            recipient_type TEXT NOT NULL
+        CREATE TABLE IF NOT EXISTS message_bodies (
+            message_id INTEGER PRIMARY KEY REFERENCES messages(id) ON DELETE CASCADE,
+            body_text TEXT,
+            body_html TEXT
         );
 
-        CREATE TABLE labels (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            source_id INTEGER NOT NULL REFERENCES sources(id),
-            source_label_id TEXT NOT NULL,
+        CREATE TABLE IF NOT EXISTS message_recipients (
+            id INTEGER PRIMARY KEY,
+            message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+            participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+            recipient_type TEXT NOT NULL,
+            display_name TEXT,
+            UNIQUE(message_id, participant_id, recipient_type)
+        );
+
+        CREATE TABLE IF NOT EXISTS labels (
+            id INTEGER PRIMARY KEY,
+            source_id INTEGER REFERENCES sources(id) ON DELETE CASCADE,
+            source_label_id TEXT,
             name TEXT NOT NULL,
-            label_type TEXT NOT NULL DEFAULT 'system'
+            label_type TEXT,
+            color TEXT,
+            UNIQUE(source_id, name)
         );
 
-        CREATE TABLE message_labels (
-            message_id INTEGER NOT NULL REFERENCES messages(id),
-            label_id INTEGER NOT NULL REFERENCES labels(id)
+        CREATE TABLE IF NOT EXISTS message_labels (
+            message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
+            label_id INTEGER NOT NULL REFERENCES labels(id) ON DELETE CASCADE,
+            PRIMARY KEY (message_id, label_id)
         );
 
-        CREATE TABLE attachments (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            message_id INTEGER NOT NULL REFERENCES messages(id),
+        CREATE TABLE IF NOT EXISTS attachments (
+            id INTEGER PRIMARY KEY,
+            message_id INTEGER NOT NULL REFERENCES messages(id) ON DELETE CASCADE,
             filename TEXT,
             mime_type TEXT,
             size INTEGER,
             content_hash TEXT,
-            storage_path TEXT
+            storage_path TEXT NOT NULL,
+            media_type TEXT,
+            width INTEGER,
+            height INTEGER,
+            duration_ms INTEGER,
+            thumbnail_hash TEXT,
+            thumbnail_path TEXT,
+            source_attachment_id TEXT,
+            attachment_metadata JSON,
+            encryption_version INTEGER DEFAULT 0,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         );
 
-        CREATE VIRTUAL TABLE messages_fts USING fts5(
+        CREATE TABLE IF NOT EXISTS message_raw (
+            message_id INTEGER PRIMARY KEY REFERENCES messages(id) ON DELETE CASCADE,
+            raw_data BLOB NOT NULL,
+            raw_format TEXT NOT NULL,
+            compression TEXT DEFAULT 'zlib',
+            encryption_version INTEGER DEFAULT 0
+        );
+
+        CREATE TABLE IF NOT EXISTS sync_runs (
+            id INTEGER PRIMARY KEY,
+            source_id INTEGER NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+            started_at DATETIME NOT NULL,
+            completed_at DATETIME,
+            status TEXT DEFAULT 'running',
+            messages_processed INTEGER DEFAULT 0,
+            messages_added INTEGER DEFAULT 0,
+            messages_updated INTEGER DEFAULT 0,
+            errors_count INTEGER DEFAULT 0,
+            error_message TEXT,
+            cursor_before TEXT,
+            cursor_after TEXT
+        );
+
+        CREATE TABLE IF NOT EXISTS sync_checkpoints (
+            source_id INTEGER NOT NULL REFERENCES sources(id) ON DELETE CASCADE,
+            checkpoint_type TEXT NOT NULL,
+            checkpoint_value TEXT NOT NULL,
+            updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (source_id, checkpoint_type)
+        );
+
+        -- Indexes
+        CREATE INDEX IF NOT EXISTS idx_messages_conversation ON messages(conversation_id, sent_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_messages_source ON messages(source_id);
+        CREATE INDEX IF NOT EXISTS idx_messages_sender ON messages(sender_id);
+        CREATE INDEX IF NOT EXISTS idx_messages_sent_at ON messages(sent_at DESC);
+        CREATE INDEX IF NOT EXISTS idx_messages_deleted ON messages(source_id, deleted_from_source_at);
+
+        CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
             subject,
             body_text,
             content='messages',
@@ -257,16 +384,24 @@ def populate(conn: sqlite3.Connection) -> None:
         body = "\n\n".join(fake.paragraphs(nb=random.randint(1, 4)))
         snippet = body[:100]
         has_attach = random.random() < 0.2
+        num_attach = random.randint(1, 3) if has_attach else 0
         size = random.randint(1000, 500000) if not has_attach else random.randint(50000, 5000000)
 
         conn.execute(
             "INSERT INTO messages (conversation_id, source_id, source_message_id, message_type, "
-            "sent_at, sender_id, subject, body_text, snippet, size_estimate, has_attachments) "
-            "VALUES (?, ?, ?, 'email', ?, ?, ?, ?, ?, ?, ?)",
-            (conv_id, sid, f"msg_{i:06d}", sent_at.isoformat(), sender_id,
-             subject, body, snippet, size, int(has_attach)),
+            "sent_at, internal_date, sender_id, is_from_me, subject, snippet, "
+            "size_estimate, has_attachments, attachment_count) "
+            "VALUES (?, ?, ?, 'email', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (conv_id, sid, f"msg_{i:06d}", sent_at.isoformat(), sent_at.isoformat(),
+             sender_id, int(is_sent), subject, snippet, size, int(has_attach), num_attach),
         )
         msg_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+        # Message body (separate table in new schema)
+        conn.execute(
+            "INSERT INTO message_bodies (message_id, body_text) VALUES (?, ?)",
+            (msg_id, body),
+        )
 
         # Recipients
         conn.execute(
@@ -277,7 +412,7 @@ def populate(conn: sqlite3.Connection) -> None:
         if random.random() < 0.15:
             cc_id = random.choice(contact_ids)
             conn.execute(
-                "INSERT INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'cc')",
+                "INSERT OR IGNORE INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'cc')",
                 (msg_id, cc_id),
             )
 
@@ -306,13 +441,12 @@ def populate(conn: sqlite3.Connection) -> None:
             lid = label_map.get((sid, label_name))
             if lid:
                 conn.execute(
-                    "INSERT INTO message_labels (message_id, label_id) VALUES (?, ?)",
+                    "INSERT OR IGNORE INTO message_labels (message_id, label_id) VALUES (?, ?)",
                     (msg_id, lid),
                 )
 
         # Attachments
         if has_attach:
-            num_attach = random.randint(1, 3)
             for _ in range(num_attach):
                 fname, mtype = random.choice(ATTACHMENT_TYPES)
                 asize = random.randint(10000, 2000000)
@@ -324,92 +458,13 @@ def populate(conn: sqlite3.Connection) -> None:
                     (msg_id, fname, mtype, asize, chash, spath),
                 )
 
-    # Populate FTS
-    conn.execute("INSERT INTO messages_fts(messages_fts) VALUES('rebuild')")
-
-
-def generate_parquet(conn: sqlite3.Connection) -> None:
-    """Generate Parquet analytics cache that the TUI reads."""
-    ANALYTICS_DIR.mkdir(parents=True, exist_ok=True)
-
-    rows = conn.execute("""
-        SELECT
-            m.id,
-            m.source_id,
-            s.identifier AS account,
-            m.conversation_id,
-            m.sent_at,
-            p.email_address AS sender_email,
-            p.display_name AS sender_name,
-            p.domain AS sender_domain,
-            m.subject,
-            m.snippet,
-            m.size_estimate,
-            m.has_attachments
+    # Populate FTS from message_bodies
+    conn.execute("""
+        INSERT INTO messages_fts(rowid, subject, body_text)
+        SELECT m.id, m.subject, mb.body_text
         FROM messages m
-        JOIN participants p ON m.sender_id = p.id
-        JOIN sources s ON m.source_id = s.id
-        WHERE m.deleted_at IS NULL
-        ORDER BY m.sent_at
-    """).fetchall()
-
-    columns = {
-        "message_id": pa.array([r[0] for r in rows], type=pa.int64()),
-        "source_id": pa.array([r[1] for r in rows], type=pa.int64()),
-        "account": pa.array([r[2] for r in rows], type=pa.string()),
-        "conversation_id": pa.array([r[3] for r in rows], type=pa.int64()),
-        "sent_at": pa.array([r[4] for r in rows], type=pa.string()),
-        "sender_email": pa.array([r[5] for r in rows], type=pa.string()),
-        "sender_name": pa.array([r[6] for r in rows], type=pa.string()),
-        "sender_domain": pa.array([r[7] for r in rows], type=pa.string()),
-        "subject": pa.array([r[8] for r in rows], type=pa.string()),
-        "snippet": pa.array([r[9] for r in rows], type=pa.string()),
-        "size_estimate": pa.array([r[10] for r in rows], type=pa.int64()),
-        "has_attachments": pa.array([bool(r[11]) for r in rows], type=pa.bool_()),
-    }
-
-    table = pa.table(columns)
-
-    # Add year column for partitioning
-    years = [r[4][:4] if r[4] else "2023" for r in rows]
-    table = table.append_column("year", pa.array(years, type=pa.string()))
-
-    # Also join labels and recipients for the Parquet cache
-    label_rows = conn.execute("""
-        SELECT ml.message_id, l.name
-        FROM message_labels ml
-        JOIN labels l ON ml.label_id = l.id
-    """).fetchall()
-    labels_by_msg: dict[int, list[str]] = {}
-    for mid, lname in label_rows:
-        labels_by_msg.setdefault(mid, []).append(lname)
-
-    recipient_rows = conn.execute("""
-        SELECT mr.message_id, p.email_address, mr.recipient_type
-        FROM message_recipients mr
-        JOIN participants p ON mr.participant_id = p.id
-    """).fetchall()
-    recipients_by_msg: dict[int, list[str]] = {}
-    for mid, email, rtype in recipient_rows:
-        recipients_by_msg.setdefault(mid, []).append(email)
-
-    label_col = pa.array(
-        [",".join(labels_by_msg.get(r[0], [])) for r in rows],
-        type=pa.string(),
-    )
-    recipient_col = pa.array(
-        [",".join(recipients_by_msg.get(r[0], [])) for r in rows],
-        type=pa.string(),
-    )
-    table = table.append_column("labels", label_col)
-    table = table.append_column("recipients", recipient_col)
-
-    pq.write_to_dataset(
-        table,
-        root_path=str(ANALYTICS_DIR),
-        partition_cols=["year"],
-    )
-    print(f"  Parquet analytics written to {ANALYTICS_DIR}")
+        LEFT JOIN message_bodies mb ON m.id = mb.message_id
+    """)
 
 
 def main() -> None:
@@ -419,11 +474,18 @@ def main() -> None:
         DB_PATH.unlink()
         print(f"Removed existing {DB_PATH}")
 
+    # Clean any existing analytics cache
+    analytics_dir = OUTPUT_DIR / "analytics"
+    if analytics_dir.exists():
+        import shutil
+        shutil.rmtree(analytics_dir)
+        print(f"Removed existing {analytics_dir}")
+
     conn = sqlite3.connect(str(DB_PATH))
     conn.execute("PRAGMA journal_mode=WAL")
 
     print("Creating schema...")
-    create_schema(conn)
+    load_schema(conn)
 
     print(f"Generating {TARGET_MESSAGES} messages across {len(ACCOUNTS)} accounts...")
     populate(conn)
@@ -436,11 +498,9 @@ def main() -> None:
     attach_count = conn.execute("SELECT COUNT(*) FROM attachments").fetchone()[0]
     print(f"  {msg_count} messages, {conv_count} conversations, {part_count} participants, {attach_count} attachments")
 
-    print("Generating Parquet analytics cache...")
-    generate_parquet(conn)
-
     conn.close()
     print(f"Done! Database: {DB_PATH}")
+    print("Run 'msgvault build-cache --full-rebuild' to generate the Parquet analytics cache.")
 
 
 if __name__ == "__main__":
