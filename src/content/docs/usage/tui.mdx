@@ -9,7 +9,7 @@ import Screenshot from '../../../components/Screenshot.astro';
 
 The TUI is built on DuckDB querying Parquet metadata exports, not the raw SQLite database. This architecture delivers aggregate queries (top senders, domains, labels, time series) **hundreds of times faster** than equivalent SQLite JOINs. The Parquet analytics layer has a small footprint, so drill-down and re-aggregation feel instant even on very large archives.
 
-See [Data Storage](/architecture/storage/) for details on the cache format and how to rebuild it.
+See [Data Storage](/architecture/storage/) for details on how this works.
 
 ## Launch
 
@@ -58,11 +58,18 @@ The Time view aggregates messages by time period. Press `t` to cycle between mon
   </figure>
 </div>
 
-## Navigation
+## Drill-down and Sub-grouping
 
-Press `Enter` to drill down into any row (e.g., click a sender to see their messages). Press `Esc` or `Backspace` to go back.
+Press `Enter` to drill into any row. For example, selecting a sender shows their individual messages. Press `Esc` or `Backspace` to go back.
 
 <Screenshot src="/tui-drilldown.svg" alt="msgvault TUI drill-down showing messages from a specific sender" />
+
+From a drill-down view, press `g` to re-aggregate the filtered messages by a different dimension. You can think of this like an interactive pivot table. The cycle skips the dimension you drilled into, so drilling into a sender and pressing `g` cycles through Recipients, Domains, Labels, and Time.
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+  <Screenshot src="/tui-subgroup-recipients.svg" alt="Sub-grouped by Recipients after drilling into a sender" />
+  <Screenshot src="/tui-subgroup-time.svg" alt="Sub-grouped by Time after drilling into a sender" />
+</div>
 
 ## Keyboard Shortcuts
 
@@ -86,9 +93,9 @@ Press `Enter` to drill down into any row (e.g., click a sender to see their mess
 | `?` | Help |
 | `q` | Quit |
 
-## Deletion Staging
+## Marking Emails for Deletion
 
-You can stage messages for deletion directly from the TUI. Select individual rows with `Space`, then press `d` to stage them. To stage an entire group (all messages from a sender, all messages with a label, etc.), press `D` from any aggregate view.
+You can stage individual messages or bulk-delete entire aggregate groups (e.g. all emails from a sender, all messages with a given label) at once. Use `Space` to select one or more rows, then press `d` to stage them. From any aggregate view, press `D` to stage every message in the current group without selecting individual rows.
 
 <Screenshot src="/tui-selection.svg" alt="msgvault TUI with rows selected for deletion staging" />
 

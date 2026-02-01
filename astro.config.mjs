@@ -57,15 +57,14 @@ export default defineConfig({
         { label: 'Interactive TUI', slug: 'usage/tui' },
         { label: 'Configuration', slug: 'configuration' },
         { label: 'CLI Reference', slug: 'cli-reference' },
+        { label: 'LLM Chat & MCP', slug: 'usage/chat' },
         {
-          label: 'Usage',
+          label: 'CLI Usage',
           items: [
             { label: 'Syncing Email', slug: 'usage/syncing' },
             { label: 'Searching', slug: 'usage/searching' },
             { label: 'Exporting Messages', slug: 'usage/exporting' },
             { label: 'Analytics & Stats', slug: 'usage/analytics' },
-            { label: 'LLM Chat', slug: 'usage/chat' },
-            { label: 'MCP Server', slug: 'usage/mcp-server' },
             { label: 'Deleting Email', slug: 'usage/deletion' },
             { label: 'Multi-Account', slug: 'usage/multi-account' },
           ],
@@ -74,7 +73,6 @@ export default defineConfig({
           label: 'Guides',
           items: [
             { label: 'Google OAuth Setup', slug: 'guides/oauth-setup' },
-            { label: 'Headless Server Setup', slug: 'guides/headless' },
 { label: 'Verify Integrity', slug: 'guides/verification' },
           ],
         },

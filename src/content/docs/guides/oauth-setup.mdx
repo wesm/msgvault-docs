@@ -1,6 +1,6 @@
 ---
 title: Google OAuth Setup
-description: Full walkthrough for creating Google Cloud OAuth credentials.
+description: Create Google Cloud OAuth credentials and authorize msgvault, including headless server setup.
 ---
 
 msgvault requires OAuth credentials to access the Gmail API. This guide walks through the complete setup.
@@ -68,3 +68,34 @@ msgvault add-account you@gmail.com
 ```
 
 This opens your browser to Google's OAuth consent page. Sign in, grant access, and tokens are stored locally in `~/.msgvault/tokens/`.
+
+## Headless Server Setup
+
+When running msgvault on a headless server (SSH, VPS, Docker), there is no browser available for the standard OAuth flow. Use the device authorization flow instead:
+
+```bash
+msgvault add-account you@gmail.com --headless
+```
+
+This displays instructions:
+
+```
+Starting device code flow...
+
+1. Open this URL in any browser:
+   https://www.google.com/device
+
+2. Enter this code when prompted:
+   ABC-XYZ
+
+Waiting for authorization...
+```
+
+1. Run the command above on the server
+2. Open `https://www.google.com/device` on any device with a browser (phone, laptop)
+3. Sign in to your Google account
+4. Enter the displayed code
+5. Grant access to msgvault
+6. The server automatically detects authorization and stores the token
+
+Once authorized, all other commands work normally. Tokens are stored in `~/.msgvault/tokens/you@gmail.com.json` and refreshed automatically.

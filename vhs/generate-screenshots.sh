@@ -62,7 +62,25 @@ wait_until "Date"
 sleep 0.5
 capture "tui-drilldown"
 
-# Navigate back
+# Sub-grouping: press g from drill-down to re-aggregate by Recipients
+send "g"
+wait_until "Recipient"
+sleep 0.5
+capture "tui-subgroup-recipients"
+
+# Cycle through remaining sub-groups: Domains -> Labels -> Time (skips Senders)
+send "g"
+sleep 0.3
+send "g"
+sleep 0.3
+send "g"
+wait_until "Time"
+sleep 0.5
+capture "tui-subgroup-time"
+
+# Navigate back to top-level
+send Escape
+sleep 0.5
 send Escape
 sleep 1
 
