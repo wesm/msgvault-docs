@@ -18,12 +18,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Install MesloLGS Nerd Font for consistent glyph rendering
-RUN mkdir -p /usr/share/fonts/meslo && \
-    curl -fsSL -o /usr/share/fonts/meslo/MesloLGS-NF-Regular.ttf \
-      "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Regular.ttf" && \
-    curl -fsSL -o /usr/share/fonts/meslo/MesloLGS-NF-Bold.ttf \
-      "https://github.com/romkatv/powerlevel10k-media/raw/master/MesloLGS%20NF%20Bold.ttf" && \
+# Install fonts for screenshot rendering (mobile-compatible fallback chain)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fonts-liberation \
+    && rm -rf /var/lib/apt/lists/* && \
     fc-cache -f
 
 # Install freeze (arch-aware)

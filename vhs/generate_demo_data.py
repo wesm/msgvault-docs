@@ -91,13 +91,30 @@ def load_schema(conn: sqlite3.Connection) -> None:
         if resolved.exists():
             print(f"  Using schema from {resolved}")
             conn.executescript(resolved.read_text())
-            # Add FTS table (not in the main schema file)
+            # Add tables that may not be in older schema versions
             conn.executescript("""
                 CREATE VIRTUAL TABLE IF NOT EXISTS messages_fts USING fts5(
                     subject,
                     body_text,
                     content='',
                     content_rowid='id'
+                );
+
+                CREATE TABLE IF NOT EXISTS participant_identifiers (
+                    id INTEGER PRIMARY KEY,
+                    participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+                    identifier_type TEXT NOT NULL,
+                    identifier_value TEXT NOT NULL,
+                    display_value TEXT,
+                    is_primary BOOLEAN DEFAULT FALSE,
+                    UNIQUE(participant_id, identifier_type, identifier_value)
+                );
+
+                CREATE TABLE IF NOT EXISTS conversation_participants (
+                    conversation_id INTEGER NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+                    participant_id INTEGER NOT NULL REFERENCES participants(id) ON DELETE CASCADE,
+                    role TEXT NOT NULL DEFAULT 'member',
+                    PRIMARY KEY (conversation_id, participant_id)
                 );
             """)
             return

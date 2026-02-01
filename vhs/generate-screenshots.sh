@@ -44,7 +44,7 @@ tmux new-session -d -s "$SESSION" -x 120 -y 40
 echo "==> TUI screenshots"
 
 send "MSGVAULT_HOME=/data msgvault tui" Enter
-wait_until "Sender Name"
+wait_until "Sender"
 
 # 1. Senders view (default)
 sleep 0.5
@@ -62,13 +62,21 @@ wait_until "Date"
 sleep 0.5
 capture "tui-drilldown"
 
-# Sub-grouping: press g from drill-down to re-aggregate by Recipients
+# Sub-grouping: press g from drill-down to re-aggregate
+# Drill-down into a Sender, first g goes to Sender Name, then:
+# Sender Name -> Recipient -> Recipient Name -> Domain -> Label -> Time
+send "g"
+sleep 0.3
+
+# Skip Sender Name, go to Recipient
 send "g"
 wait_until "Recipient"
 sleep 0.5
 capture "tui-subgroup-recipients"
 
-# Cycle through remaining sub-groups: Domains -> Labels -> Time (skips Senders)
+# Cycle: Recipient Name -> Domain -> Label -> Time
+send "g"
+sleep 0.3
 send "g"
 sleep 0.3
 send "g"
@@ -85,7 +93,7 @@ send Escape
 sleep 1
 
 # --- Search screenshots (at top-level Senders) ---
-wait_until "Sender Name"
+wait_until "Sender"
 
 # Search for a sender
 send "/"
@@ -116,12 +124,16 @@ send Escape
 sleep 0.5
 send Escape
 sleep 0.5
-wait_until "Sender Name"
+wait_until "Sender"
 sleep 0.5
 
-# 3. Domains view (cycle: Sender -> Recipient -> Domain)
+# 3. Domains view (cycle: Sender -> Sender Name -> Recipient -> Recipient Name -> Domain)
 send "g"
-wait_until "Recipient"
+sleep 0.3
+send "g"
+sleep 0.3
+send "g"
+sleep 0.3
 send "g"
 wait_until "Domain"
 sleep 0.5
@@ -151,8 +163,9 @@ sleep 0.5
 capture "tui-time-yearly"
 
 # 6. Multi-row selection (back to Sender first)
+# From Time, cycle: Sender
 send "g"
-wait_until "Sender Name"
+wait_until "Sender"
 sleep 0.5
 send Down
 sleep 0.3

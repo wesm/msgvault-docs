@@ -4,7 +4,7 @@
   "margin": [0, 0, 0, 0],
   "background": "#1a1b26",
   "font": {
-    "family": "MesloLGS NF",
+    "family": "SF Mono, Menlo, Consolas, Liberation Mono, monospace",
     "size": 14
   },
   "line_height": 1.2,
