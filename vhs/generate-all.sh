@@ -3,7 +3,6 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 IMAGE_NAME="msgvault-vhs"
-TAPES_DIR="$SCRIPT_DIR/tapes"
 DEMO_DATA_DIR="$SCRIPT_DIR/demo-data"
 OUTPUT_DIR="$SCRIPT_DIR/../public"
 
@@ -11,39 +10,27 @@ usage() {
     cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Record msgvault TUI demos as .webm videos using VHS.
+Generate msgvault SVG screenshots using freeze + tmux.
 
 Options:
   --repo PATH     Path to msgvault source repo (default: ../msgvault sibling dir)
-  --tape NAME     Record a single tape (without .tape extension)
-  --list          List available tapes
   --skip-data     Skip demo data generation
   --skip-build    Skip Docker image build
   -h, --help      Show this help
 EOF
 }
 
-list_tapes() {
-    echo "Available tapes:"
-    for f in "$TAPES_DIR"/*.tape; do
-        echo "  $(basename "$f" .tape)"
-    done
-}
-
 REPO="${MSGVAULT_REPO:-$SCRIPT_DIR/../../msgvault}"
-SINGLE_TAPE=""
 SKIP_DATA=false
 SKIP_BUILD=false
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --repo)     REPO="$2"; shift 2 ;;
-        --tape)     SINGLE_TAPE="$2"; shift 2 ;;
-        --list)     list_tapes; exit 0 ;;
-        --skip-data) SKIP_DATA=true; shift ;;
+        --repo)       REPO="$2"; shift 2 ;;
+        --skip-data)  SKIP_DATA=true; shift ;;
         --skip-build) SKIP_BUILD=true; shift ;;
-        -h|--help)  usage; exit 0 ;;
-        *)          echo "Unknown option: $1"; usage; exit 1 ;;
+        -h|--help)    usage; exit 0 ;;
+        *)            echo "Unknown option: $1"; usage; exit 1 ;;
     esac
 done
 
@@ -77,49 +64,17 @@ docker run --rm \
     build-cache --full-rebuild
 echo ""
 
-# --- Step 4: Record tapes ---
+# --- Step 4: Generate screenshots ---
 mkdir -p "$OUTPUT_DIR"
 
-record_tape() {
-    local tape_name="$1"
-    local tape_file="$TAPES_DIR/${tape_name}.tape"
-
-    if [[ ! -f "$tape_file" ]]; then
-        echo "Error: tape not found: $tape_file"
-        return 1
-    fi
-
-    echo "==> Recording: $tape_name"
-    docker run --rm \
-        -v "$TAPES_DIR:/tapes" \
-        -v "$DEMO_DATA_DIR:/data" \
-        -e "MSGVAULT_HOME=/data" \
-        "$IMAGE_NAME" \
-        "/tapes/${tape_name}.tape"
-
-    # Copy output (videos and screenshots)
-    local output_dir="$TAPES_DIR/output"
-    local found=false
-    for f in "$output_dir"/*.webm "$output_dir"/*.png "$output_dir"/*.svg; do
-        if [[ -f "$f" ]]; then
-            cp "$f" "$OUTPUT_DIR/"
-            echo "  -> $OUTPUT_DIR/$(basename "$f")"
-            found=true
-        fi
-    done
-    if [[ "$found" == false ]]; then
-        echo "  Warning: no output files found in $output_dir"
-    fi
-}
-
-if [[ -n "$SINGLE_TAPE" ]]; then
-    record_tape "$SINGLE_TAPE"
-else
-    for tape_file in "$TAPES_DIR"/*.tape; do
-        tape_name="$(basename "$tape_file" .tape)"
-        record_tape "$tape_name"
-    done
-fi
+echo "==> Generating SVG screenshots..."
+docker run --rm \
+    -v "$SCRIPT_DIR:/tapes" \
+    -v "$DEMO_DATA_DIR:/data" \
+    -v "$OUTPUT_DIR:/output" \
+    -e "MSGVAULT_HOME=/data" \
+    "$IMAGE_NAME" \
+    /tapes/generate-screenshots.sh /output
 
 echo ""
 echo "Done! Output files are in $OUTPUT_DIR"
