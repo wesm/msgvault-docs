@@ -10,6 +10,7 @@ export default defineConfig({
       components: {
         ThemeSelect: './src/components/EmptyThemeSelect.astro',
         Header: './src/components/Header.astro',
+        Footer: './src/components/Footer.astro',
       },
       customCss: ['./src/styles/custom.css'],
       expressiveCode: {

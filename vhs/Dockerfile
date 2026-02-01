@@ -1,11 +1,11 @@
 # Stage 1: Build msgvault binary
-FROM golang:1.24-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 RUN apk add --no-cache git make gcc musl-dev
 
 COPY . /src
 WORKDIR /src
-RUN go build -o /usr/local/bin/msgvault .
+RUN make build
 
 # Stage 2: VHS recording runtime
 FROM alpine:3.19
@@ -43,7 +43,7 @@ RUN mv /usr/bin/chromium-browser /usr/bin/chromium-browser-real && \
     chmod +x /usr/bin/chromium-browser
 
 # Copy msgvault binary from builder
-COPY --from=builder /usr/local/bin/msgvault /usr/local/bin/msgvault
+COPY --from=builder /src/msgvault /usr/local/bin/msgvault
 
 WORKDIR /tapes
 ENTRYPOINT ["vhs"]
