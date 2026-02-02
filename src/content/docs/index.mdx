@@ -32,7 +32,7 @@ Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/setup
 
 ## Why msgvault?
 
-Your email and other message data is yours. msgvault downloads a complete local copy of your Gmail (every message, every attachment, every label) then everything runs offline against that archive. Search, analytics, the TUI, LLM chat, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
+Your email and other message data is yours. msgvault downloads a complete local copy of your Gmail (every message, every attachment, every label) then everything runs offline against that archive. Search, analytics, the TUI, and the MCP server all query local SQLite and Parquet files. **Nothing touches the Gmail API outside of sync and deletion commands that you run explicitly.** No background OAuth sessions, no persistent API connections, no risk of an AI assistant or a compromised token silently accessing your live mailbox.
 
 Years of PDFs, photos, documents, and spreadsheets buried in your inbox become ordinary files on your filesystem, deduplicated and instantly searchable. Your data is no longer locked behind a web interface or an API. It's just files on disk that you own and control.
 
@@ -54,11 +54,8 @@ Years of PDFs, photos, documents, and spreadsheets buried in your inbox become o
   <Card title="Incremental Sync" icon="rocket">
     Uses Gmail History API for efficient updates after initial full sync. Resumable checkpoints for interrupted syncs.
   </Card>
-  <Card title="LLM Chat" icon="comment">
-    Ask natural-language questions about your archive using any LLM: local models via Ollama, or cloud APIs like Anthropic and OpenAI. RAG-based retrieval with grounded, cited answers.
-  </Card>
   <Card title="MCP Server" icon="puzzle">
-    Expose your archive to AI assistants like Claude Desktop via the Model Context Protocol.
+    Expose your archive to AI assistants like Claude Desktop via the Model Context Protocol. Search, read, and analyze your messages from any MCP-compatible LLM.
   </Card>
   <Card title="Safe Deletion" icon="warning">
     Stage messages for deletion in the TUI, review manifests, then permanently delete from Gmail.
@@ -67,4 +64,4 @@ Years of PDFs, photos, documents, and spreadsheets buried in your inbox become o
 
 ## How It Works
 
-<img src="/how-it-works.svg" alt="msgvault architecture: Gmail API syncs to SQLite, then offline Parquet analytics, FTS5 search, TUI, LLM Chat, and MCP Server" style="width: 100%; max-width: 960px; margin: 1.5rem auto; display: block;" />
+<img src="/how-it-works.svg" alt="msgvault architecture: Gmail API syncs to SQLite, then offline Parquet analytics, FTS5 search, TUI, and MCP Server" style="width: 100%; max-width: 960px; margin: 1.5rem auto; display: block;" />

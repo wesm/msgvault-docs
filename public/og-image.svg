@@ -48,11 +48,8 @@
     <rect x="155" y="0" width="170" height="32" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
     <text x="240" y="21" text-anchor="middle" fill="#c0c0c0" font-size="13" font-weight="500">DuckDB + Parquet</text>
 
-    <rect x="340" y="0" width="120" height="32" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
-    <text x="400" y="21" text-anchor="middle" fill="#c0c0c0" font-size="13" font-weight="500">LLM Chat</text>
-
-    <rect x="475" y="0" width="140" height="32" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
-    <text x="545" y="21" text-anchor="middle" fill="#c0c0c0" font-size="13" font-weight="500">MCP Server</text>
+    <rect x="340" y="0" width="140" height="32" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+    <text x="410" y="21" text-anchor="middle" fill="#c0c0c0" font-size="13" font-weight="500">MCP Server</text>
   </g>
 
   <!-- Bottom URL -->

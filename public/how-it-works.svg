@@ -32,7 +32,7 @@
   <!-- Sync box -->
   <rect x="290" y="72" width="220" height="50" class="box-online" rx="0"/>
   <text x="400" y="95" text-anchor="middle" class="label">sync-full</text>
-  <text x="400" y="112" text-anchor="middle" class="sublabel">sync-incremental</text>
+  <text x="400" y="112" text-anchor="middle" class="sublabel">sync</text>
 
   <!-- Offline divider -->
   <line x1="20" y1="160" x2="780" y2="160" class="divider"/>
