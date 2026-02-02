@@ -27,12 +27,12 @@
   <text x="120" y="102" text-anchor="middle" class="label">Gmail API</text>
 
   <!-- Arrow: Gmail -> Sync -->
-  <line x1="200" y1="97" x2="358" y2="97" class="arrow"/>
+  <line x1="200" y1="97" x2="288" y2="97" class="arrow"/>
 
   <!-- Sync box -->
-  <rect x="360" y="72" width="220" height="50" class="box-online" rx="0"/>
-  <text x="470" y="95" text-anchor="middle" class="label">sync-full</text>
-  <text x="470" y="112" text-anchor="middle" class="sublabel">sync-incremental</text>
+  <rect x="290" y="72" width="220" height="50" class="box-online" rx="0"/>
+  <text x="400" y="95" text-anchor="middle" class="label">sync-full</text>
+  <text x="400" y="112" text-anchor="middle" class="sublabel">sync-incremental</text>
 
   <!-- Offline divider -->
   <line x1="20" y1="160" x2="780" y2="160" class="divider"/>
@@ -40,7 +40,7 @@
   <text x="400" y="165" text-anchor="middle" class="divider-label">OFFLINE BOUNDARY</text>
 
   <!-- Arrow: Sync down to data plane -->
-  <path d="M 470 122 L 470 148 L 400 148 L 400 204" class="arrow-down"/>
+  <line x1="400" y1="122" x2="400" y2="204" class="arrow-down"/>
 
   <!-- Query plane bounding box -->
   <rect x="30" y="206" width="740" height="180" class="plane-border" rx="4"/>
