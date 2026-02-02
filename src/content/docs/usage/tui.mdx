@@ -19,6 +19,19 @@ The TUI automatically builds or updates the Parquet analytics cache on launch wh
 
 <Screenshot src="/tui-senders.svg" alt="msgvault TUI showing the Senders view with message counts and sizes" />
 
+Press `a` from any aggregate view to show all individual messages in that view. Press `Enter` on a message to view its full detail, including headers and body.
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+  <figure style="margin: 0; text-align: center;" data-lightbox>
+    <img src="/tui-all-messages.svg" alt="msgvault TUI showing all messages list" style="width: 100%; border-radius: 4px;" />
+    <figcaption style="font-size: 0.8rem; color: #888; margin-top: 0.3rem;">All messages</figcaption>
+  </figure>
+  <figure style="margin: 0; text-align: center;" data-lightbox>
+    <img src="/tui-message-detail.svg" alt="msgvault TUI showing a single message detail view" style="width: 100%; border-radius: 4px;" />
+    <figcaption style="font-size: 0.8rem; color: #888; margin-top: 0.3rem;">Message detail</figcaption>
+  </figure>
+</div>
+
 ## View Modes
 
 The TUI provides seven aggregate view modes. Press `g` to cycle through them:
@@ -104,13 +117,12 @@ Press `Esc` to return to the message list.
 | `Esc` / `Backspace` | Go back |
 | `g` | Cycle view mode |
 | `s` | Cycle sort field (Name / Count / Size) |
-| `r` | Reverse sort direction |
+| `v` | Reverse sort direction |
 | `t` | Jump to Time view (cycle granularity when already in Time) |
-| `a` | Filter by account |
+| `a` | Show all individual messages in current view |
+| `A` | Filter by account |
 | `f` | Filter by attachments |
 | `Space` | Toggle selection |
-| `A` | Select all visible |
-| `x` | Clear selection |
 | `d` | Stage selected for deletion |
 | `D` | Stage all matching current filter |
 | `/` | Search |

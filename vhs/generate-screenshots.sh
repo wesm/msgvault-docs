@@ -54,6 +54,25 @@ wait_until "Sender"
 sleep 0.5
 capture "tui-senders"
 
+# All messages view: press a to show individual messages
+send "a"
+wait_until "Date"
+sleep 0.5
+capture "tui-all-messages"
+
+# Message detail: press Enter to view a message
+send Enter
+sleep 1
+capture "tui-message-detail"
+
+# Back to senders
+send Escape
+sleep 0.5
+send Escape
+sleep 0.5
+wait_until "Sender"
+sleep 0.5
+
 # 2. Drill into a sender
 send Down
 sleep 0.3
