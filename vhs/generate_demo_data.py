@@ -358,6 +358,238 @@ def generate_contacts(conn: sqlite3.Connection, count: int = 80) -> list[int]:
     return ids
 
 
+DEMO_THREAD_MESSAGES = [
+    {
+        "from": "sarah.benson@company.io",
+        "from_name": "Sarah Benson",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Team,\n\n"
+            "I've drafted the initial timeline for the Q3 infrastructure migration. "
+            "We're looking at moving the primary database cluster to the new region "
+            "starting July 15th, with a two-week buffer for testing.\n\n"
+            "Key milestones:\n"
+            "- July 1-14: Provision new cluster and run parallel writes\n"
+            "- July 15: Cut over read traffic\n"
+            "- July 22: Cut over write traffic\n"
+            "- July 29: Decommission old cluster\n\n"
+            "Let me know if this works with everyone's schedules."
+        ),
+        "date": datetime.datetime(2024, 6, 10, 9, 15, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Thanks Sarah. The timeline looks reasonable but I'm worried about the "
+            "parallel writes phase. Last time we tried that with the analytics cluster "
+            "we hit replication lag issues that took three days to sort out.\n\n"
+            "Can we schedule a 30-minute deep dive on the replication strategy before "
+            "we commit to the July 1st start date?"
+        ),
+        "date": datetime.datetime(2024, 6, 10, 10, 2, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from": "sarah.benson@company.io",
+        "from_name": "Sarah Benson",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Good point. The analytics cluster was a different situation though, we were "
+            "running async replication. For this migration I'm planning synchronous "
+            "replication with a dedicated 10Gbps link between regions.\n\n"
+            "But yes, let's do the deep dive. How about Thursday at 2pm?"
+        ),
+        "date": datetime.datetime(2024, 6, 10, 10, 45, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from": "marcus.wright@company.io",
+        "from_name": "Marcus Wright",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Thursday 2pm works for me. I'll bring the latency benchmarks from "
+            "the staging environment. We've been running synthetic load tests "
+            "and the p99 looks promising, under 12ms cross-region.\n\n"
+            "One concern: do we have a rollback plan if the cut-over fails? "
+            "The last outage cost us about $40K in SLA credits."
+        ),
+        "date": datetime.datetime(2024, 6, 10, 11, 30, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "12ms p99 is great. That's well within our latency budget.\n\n"
+            "For rollback, I think we need a blue-green approach. Keep the old "
+            "cluster warm for at least 48 hours after cut-over. We can use the "
+            "load balancer to flip traffic back in under 60 seconds if needed.\n\n"
+            "I'll draft the rollback runbook before Thursday."
+        ),
+        "date": datetime.datetime(2024, 6, 10, 13, 5, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from": "sarah.benson@company.io",
+        "from_name": "Sarah Benson",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Blue-green is exactly what I had in mind. I've already reserved the "
+            "capacity so we won't be paying double for long.\n\n"
+            "I'm also going to loop in DevOps to set up automated health checks "
+            "that trigger the rollback automatically if error rates spike above 1%."
+        ),
+        "date": datetime.datetime(2024, 6, 10, 14, 20, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from": "marcus.wright@company.io",
+        "from_name": "Marcus Wright",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Automated rollback is a great idea. Can we also add a circuit breaker "
+            "on the write path? If the new cluster starts rejecting writes we should "
+            "failover to the old cluster immediately rather than queuing.\n\n"
+            "I've seen too many migrations where queued writes caused data "
+            "consistency issues during recovery."
+        ),
+        "date": datetime.datetime(2024, 6, 10, 15, 10, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Agreed. Circuit breaker on writes is non-negotiable. I'll add it to "
+            "the requirements doc.\n\n"
+            "So to summarize what we need before the Thursday meeting:\n"
+            "1. Rollback runbook (me)\n"
+            "2. Latency benchmarks from staging (Marcus)\n"
+            "3. Automated health check design (Sarah + DevOps)\n"
+            "4. Circuit breaker spec (me)\n\n"
+            "Anything else?"
+        ),
+        "date": datetime.datetime(2024, 6, 10, 15, 45, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from": "sarah.benson@company.io",
+        "from_name": "Sarah Benson",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "One more thing: we should notify the on-call team about the migration "
+            "window. Last time they weren't in the loop and nearly triggered an "
+            "incident response when they saw the traffic shift.\n\n"
+            "I'll send out the communication plan tomorrow. See everyone Thursday!"
+        ),
+        "date": datetime.datetime(2024, 6, 10, 16, 30, tzinfo=datetime.timezone.utc),
+    },
+    {
+        "from": "marcus.wright@company.io",
+        "from_name": "Marcus Wright",
+        "to_me": True,
+        "subject": "Re: Q3 Infrastructure Migration Plan",
+        "body": (
+            "Good call on the on-call notification. I'll also update the runbook "
+            "wiki with the new architecture diagram so the overnight team knows "
+            "what to expect.\n\n"
+            "See you all Thursday. This is shaping up to be a solid plan."
+        ),
+        "date": datetime.datetime(2024, 6, 11, 8, 15, tzinfo=datetime.timezone.utc),
+    },
+]
+
+
+def create_demo_thread(
+    conn: sqlite3.Connection,
+    source_id: int,
+    account_pid: int,
+    contact_ids: list[int],
+    label_map: dict[tuple[int, str], int],
+) -> None:
+    """Create a curated 10-message email thread for the thread view screenshot."""
+    # Create participants for the thread
+    sarah_pid = get_or_create_participant(conn, "sarah.benson@company.io", "Sarah Benson")
+    marcus_pid = get_or_create_participant(conn, "marcus.wright@company.io", "Marcus Wright")
+
+    # Create conversation
+    conv_id_str = "thread_demo_infra"
+    conn.execute(
+        "INSERT INTO conversations (source_id, source_conversation_id, conversation_type, "
+        "title, message_count, last_message_at) VALUES (?, ?, 'email_thread', ?, ?, ?)",
+        (source_id, conv_id_str, "Re: Q3 Infrastructure Migration Plan",
+         len(DEMO_THREAD_MESSAGES),
+         DEMO_THREAD_MESSAGES[-1]["date"].isoformat()),
+    )
+    conv_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+
+    prev_msg_id = None
+    for pos, msg in enumerate(DEMO_THREAD_MESSAGES):
+        is_from_me = msg.get("from_me", False)
+
+        if is_from_me:
+            sender_id = account_pid
+            recipient_ids = [sarah_pid, marcus_pid]
+        else:
+            sender_id = get_or_create_participant(conn, msg["from"], msg.get("from_name"))
+            recipient_ids = [account_pid]
+            # CC the other external participant
+            other = marcus_pid if sender_id == sarah_pid else sarah_pid
+            cc_ids = [other]
+
+        source_msg_id = f"msg_demo_thread_{pos:02d}"
+        sent_at = msg["date"].isoformat()
+
+        conn.execute(
+            "INSERT INTO messages (conversation_id, source_id, source_message_id, message_type, "
+            "sent_at, internal_date, sender_id, is_from_me, subject, snippet, "
+            "reply_to_message_id, thread_position, size_estimate, has_attachments, attachment_count) "
+            "VALUES (?, ?, ?, 'email', ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)",
+            (conv_id, source_id, source_msg_id, sent_at, sent_at,
+             sender_id, int(is_from_me), msg["subject"], msg["body"][:100],
+             prev_msg_id, pos, len(msg["body"])),
+        )
+        msg_id = conn.execute("SELECT last_insert_rowid()").fetchone()[0]
+        prev_msg_id = msg_id
+
+        conn.execute(
+            "INSERT INTO message_bodies (message_id, body_text) VALUES (?, ?)",
+            (msg_id, msg["body"]),
+        )
+
+        # from recipient
+        conn.execute(
+            "INSERT INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'from')",
+            (msg_id, sender_id),
+        )
+        # to recipients
+        for rid in recipient_ids:
+            conn.execute(
+                "INSERT OR IGNORE INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'to')",
+                (msg_id, rid),
+            )
+        # cc
+        if not is_from_me:
+            for cid in cc_ids:
+                conn.execute(
+                    "INSERT OR IGNORE INTO message_recipients (message_id, participant_id, recipient_type) VALUES (?, ?, 'cc')",
+                    (msg_id, cid),
+                )
+
+        # Labels
+        if is_from_me:
+            lid = label_map.get((source_id, "SENT"))
+        else:
+            lid = label_map.get((source_id, "INBOX"))
+        if lid:
+            conn.execute("INSERT OR IGNORE INTO message_labels (message_id, label_id) VALUES (?, ?)", (msg_id, lid))
+
+        # Also mark as IMPORTANT
+        imp_lid = label_map.get((source_id, "IMPORTANT"))
+        if imp_lid:
+            conn.execute("INSERT OR IGNORE INTO message_labels (message_id, label_id) VALUES (?, ?)", (msg_id, imp_lid))
+
+
 def populate(conn: sqlite3.Connection) -> None:
     # Create sources
     source_ids = []
@@ -501,6 +733,9 @@ def populate(conn: sqlite3.Connection) -> None:
                     "VALUES (?, ?, ?, ?, ?, ?)",
                     (msg_id, fname, mtype, asize, chash, spath),
                 )
+
+    # --- Curated email thread for screenshot demos ---
+    create_demo_thread(conn, source_ids[0], account_participant_ids[0], contact_ids, label_map)
 
     # Populate conversation_participants from messages + recipients
     conn.execute("""

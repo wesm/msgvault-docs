@@ -66,18 +66,49 @@ wait_until "Date"
 sleep 0.5
 capture "tui-drilldown"
 
-# Thread view: press T to view the full email thread
+# Go back to senders for thread screenshot
+send Escape
+sleep 0.5
+
+# Thread view: search for sarah.benson to find the curated thread
+send "/"
+sleep 0.5
+send -l "sarah.benson"
+sleep 1.5
+send Enter
+sleep 0.5
+wait_until "benson"
+
+# Drill into Sarah Benson
+send Enter
+wait_until "Date"
+sleep 0.5
+
+# Find the Infrastructure Migration thread and open it
 send "T"
 sleep 1
 capture "tui-thread"
 
-# Go back to message list
+# Go back to top-level senders
 send Escape
 sleep 0.5
+send Escape
+sleep 0.5
+send Escape
+sleep 0.5
+wait_until "Sender"
+sleep 0.5
 
-# Sub-grouping: press g from drill-down to re-aggregate
-# Drill-down into a Sender, first g goes to Sender Name, then:
-# Recipient -> Recipient Name -> Domain -> Label -> Time
+# Sub-grouping: drill into a sender first, then press g to re-aggregate
+send Down
+sleep 0.3
+send Down
+sleep 0.3
+send Down
+sleep 0.3
+send Enter
+wait_until "Date"
+sleep 0.5
 send "g"
 wait_until "Recipient"
 sleep 0.5
