@@ -57,7 +57,7 @@ export default defineConfig({
         { label: 'Interactive TUI', slug: 'usage/tui' },
         { label: 'Configuration', slug: 'configuration' },
         { label: 'CLI Reference', slug: 'cli-reference' },
-        { label: 'LLM Chat & MCP', slug: 'usage/chat' },
+        { label: 'MCP Server and LLMs', slug: 'usage/chat' },
         {
           label: 'CLI Usage',
           items: [

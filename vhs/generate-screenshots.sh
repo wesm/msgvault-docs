@@ -75,15 +75,13 @@ sleep 0.5
 # Drill-down into a Sender, first g goes to Sender Name, then:
 # Sender Name -> Recipient -> Recipient Name -> Domain -> Label -> Time
 send "g"
-sleep 0.3
-
-# Skip Sender Name, go to Recipient
-send "g"
 wait_until "Recipient"
 sleep 0.5
 capture "tui-subgroup-recipients"
 
-# Cycle: Recipient Name -> Domain -> Label -> Time
+# Cycle: Recipient -> Recipient Name -> Domain -> Label -> Time
+send "g"
+sleep 0.3
 send "g"
 sleep 0.3
 send "g"
