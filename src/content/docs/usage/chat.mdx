@@ -38,6 +38,7 @@ The MCP server exposes the following tools to connected AI clients:
 | `search_messages` | Full-text search with Gmail-like query syntax | `query` (string), `max_results` (int, optional) |
 | `get_message` | Retrieve a single message by ID | `message_id` (int) |
 | `list_messages` | List messages with filters | `from` (string), `to` (string), `label` (string), `before` (date), `after` (date), `limit` (int) |
+| `get_attachment` | Retrieve an attachment by message ID and filename | `message_id` (int), `filename` (string) |
 | `get_stats` | Archive statistics | — |
 | `aggregate` | Run aggregate queries (top senders, domains, labels, time series) | `group_by` (string), `limit` (int), `account` (string, optional) |
 

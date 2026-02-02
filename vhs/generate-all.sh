@@ -51,7 +51,7 @@ fi
 # --- Step 2: Build Docker image ---
 if [[ "$SKIP_BUILD" == false ]]; then
     echo "==> Building Docker image: $IMAGE_NAME"
-    docker build -t "$IMAGE_NAME" -f "$SCRIPT_DIR/Dockerfile" "$REPO"
+    DOCKER_BUILDKIT=1 docker build -t "$IMAGE_NAME" -f "$SCRIPT_DIR/Dockerfile" "$REPO"
     echo ""
 fi
 

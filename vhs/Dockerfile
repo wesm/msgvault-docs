@@ -5,7 +5,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends git make gcc g+
 
 COPY . /src
 WORKDIR /src
-RUN make build
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    make build
 
 # Stage 2: Screenshot runtime with freeze + tmux
 FROM debian:bookworm-slim

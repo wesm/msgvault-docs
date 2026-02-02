@@ -73,22 +73,14 @@ sleep 0.5
 
 # Sub-grouping: press g from drill-down to re-aggregate
 # Drill-down into a Sender, first g goes to Sender Name, then:
-# Sender Name -> Recipient -> Recipient Name -> Domain -> Label -> Time
+# Recipient -> Recipient Name -> Domain -> Label -> Time
 send "g"
 wait_until "Recipient"
 sleep 0.5
 capture "tui-subgroup-recipients"
 
-# Cycle: Recipient -> Recipient Name -> Domain -> Label -> Time
-send "g"
-sleep 0.3
-send "g"
-sleep 0.3
-send "g"
-sleep 0.3
-send "g"
-sleep 0.3
-send "g"
+# Switch to time grouping
+send "t"
 wait_until "Time"
 sleep 0.5
 capture "tui-subgroup-time"
