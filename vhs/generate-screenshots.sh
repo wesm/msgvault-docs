@@ -36,7 +36,11 @@ wait_until() {
 }
 
 # --- Start tmux session ---
-tmux new-session -d -s "$SESSION" -x 120 -y 40
+tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 40
+tmux set-option -g default-terminal "tmux-256color"
+tmux set-option -ga terminal-overrides ",*:Tc"
+tmux send-keys -t "$SESSION" "export COLORTERM=truecolor" Enter
+sleep 0.3
 
 # =====================
 # TUI Screenshots
