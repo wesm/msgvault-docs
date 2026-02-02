@@ -61,7 +61,6 @@ export default defineConfig({
         {
           label: 'CLI Usage',
           items: [
-            { label: 'Syncing Email', slug: 'usage/syncing' },
             { label: 'Searching', slug: 'usage/searching' },
             { label: 'Exporting Messages', slug: 'usage/exporting' },
             { label: 'Analytics & Stats', slug: 'usage/analytics' },

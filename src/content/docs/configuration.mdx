@@ -12,14 +12,8 @@ Default location: `~/.msgvault/config.toml`
 # Base data directory (default: ~/.msgvault)
 data_dir = "/path/to/msgvault/data"
 
-# Database path (default: {data_dir}/msgvault.db)
-db_path = "/path/to/msgvault.db"
-
-# Attachments directory (default: {data_dir}/attachments)
-attachments_dir = "/path/to/attachments"
-
-# Token storage directory (default: {data_dir}/tokens)
-tokens_dir = "/path/to/tokens"
+# Database URL (default: {data_dir}/msgvault.db)
+database_url = "/path/to/msgvault.db"
 
 [oauth]
 # Path to Google OAuth client secrets JSON (required)
@@ -30,14 +24,12 @@ client_secrets = "/path/to/client_secret.json"
 rate_limit_qps = 5
 
 [chat]
-# LLM provider: "ollama", "anthropic", or "openai"
-provider = "ollama"
-# Ollama API endpoint (ollama provider only)
+# Ollama API endpoint
 server = "http://localhost:11434"
-# Model name (provider-specific)
-model = "llama3.1"
+# Model name
+model = "gpt-oss-128k"
 # Maximum messages to retrieve per query
-max_results = 10
+max_results = 20
 ```
 
 ## Sections
@@ -47,9 +39,9 @@ max_results = 10
 | Key | Default | Description |
 |---|---|---|
 | `data_dir` | `~/.msgvault` | Base directory for all data |
-| `db_path` | `{data_dir}/msgvault.db` | SQLite database path |
-| `attachments_dir` | `{data_dir}/attachments` | Content-addressed attachment storage |
-| `tokens_dir` | `{data_dir}/tokens` | OAuth token storage |
+| `database_url` | `{data_dir}/msgvault.db` | SQLite database path |
+
+Attachments and OAuth tokens are stored in subdirectories of `data_dir` (`attachments/` and `tokens/` respectively). These paths are not independently configurable.
 
 ### `[oauth]`
 
@@ -67,17 +59,15 @@ max_results = 10
 
 | Key | Default | Description |
 |---|---|---|
-| `provider` | `ollama` | LLM provider: `ollama`, `anthropic`, or `openai` |
-| `server` | `http://localhost:11434` | Ollama API endpoint (Ollama provider only) |
-| `model` | `llama3.1` | Model name (provider-specific) |
-| `max_results` | `10` | Maximum messages to retrieve per query |
+| `server` | `http://localhost:11434` | Ollama API endpoint |
+| `model` | `gpt-oss-128k` | Model name |
+| `max_results` | `20` | Maximum messages to retrieve per query |
 
 ## Environment Variables
 
 | Variable | Description |
 |---|---|
 | `MSGVAULT_HOME` | Base directory for all data (default: `~/.msgvault`) |
-| `MSGVAULT_CONFIG` | Path to config file (default: `~/.msgvault/config.toml`) |
 
 ## File Locations
 
