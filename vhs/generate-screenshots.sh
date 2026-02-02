@@ -62,6 +62,15 @@ wait_until "Date"
 sleep 0.5
 capture "tui-drilldown"
 
+# Thread view: press T to view the full email thread
+send "T"
+sleep 1
+capture "tui-thread"
+
+# Go back to message list
+send Escape
+sleep 0.5
+
 # Sub-grouping: press g from drill-down to re-aggregate
 # Drill-down into a Sender, first g goes to Sender Name, then:
 # Sender Name -> Recipient -> Recipient Name -> Domain -> Label -> Time

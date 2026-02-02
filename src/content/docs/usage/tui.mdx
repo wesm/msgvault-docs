@@ -86,12 +86,21 @@ Search also works after drill-down. Drill into a result, then press `/` again to
   <Screenshot src="/tui-search-subject.svg" alt="Searching within a sender's messages by subject keyword with highlighted matches" />
 </div>
 
+## Viewing Email Threads
+
+From any message list (after drilling into a sender, label, domain, etc.), press `T` to open the full email thread for the highlighted message. This renders the complete conversation inline in the terminal, including sender, date, and body text for each message in the thread.
+
+<Screenshot src="/tui-thread.svg" alt="msgvault TUI showing a full email thread conversation" />
+
+Press `Esc` to return to the message list.
+
 ## Keyboard Shortcuts
 
 | Key | Action |
 |---|---|
 | `j` / `k` or `↑` / `↓` | Navigate rows |
 | `Enter` | Drill down into selection |
+| `T` | View full email thread |
 | `Esc` / `Backspace` | Go back |
 | `g` | Cycle view mode |
 | `s` | Cycle sort field (Name / Count / Size) |
