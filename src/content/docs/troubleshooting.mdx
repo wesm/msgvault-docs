@@ -17,6 +17,10 @@ The Gmail scope isn't configured. Verify you added `gmail.modify` scope and that
 
 Wrong application type. Ensure you selected **Desktop app** when creating OAuth credentials.
 
+### "device flow not supported" or "Invalid client type"
+
+When using `--headless`, you must have OAuth credentials created with the **"TVs and Limited Input devices"** application type. Desktop application credentials don't support the device code flow. Create a new OAuth client with the correct type in Google Cloud Console.
+
 ### General OAuth Issues
 
 1. Remove old tokens: `rm ~/.msgvault/tokens/you@gmail.com.json`
