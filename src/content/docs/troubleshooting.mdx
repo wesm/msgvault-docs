@@ -15,17 +15,33 @@ The Gmail scope isn't configured. Verify you added `gmail.modify` scope and that
 
 ### "redirect_uri_mismatch"
 
-Wrong application type. Ensure you selected **Desktop app** when creating OAuth credentials.
+Wrong application type. Ensure you selected **Desktop application** when creating OAuth credentials.
 
-### "device flow not supported" or "Invalid client type"
+### "OAuth client is missing redirect_uris"
 
-When using `--headless`, you must have OAuth credentials created with the **"TVs and Limited Input devices"** application type. Desktop application credentials don't support the device code flow. Create a new OAuth client with the correct type in Google Cloud Console.
+You created a "TVs and Limited Input devices" OAuth client, which doesn't work with Gmail. Google's device code flow does not support Gmail scopes. Create a new OAuth client with **Desktop application** type instead.
 
 ### General OAuth Issues
 
 1. Remove old tokens: `rm ~/.msgvault/tokens/you@gmail.com.json`
 2. Re-add account: `msgvault add-account you@gmail.com`
 3. Revoke and retry: [myaccount.google.com/permissions](https://myaccount.google.com/permissions)
+
+## Headless Server Issues
+
+### "No browser available"
+
+The standard OAuth flow requires a browser. For headless servers, use the copy-token workflow:
+
+1. Authorize on a machine with a browser: `msgvault add-account you@gmail.com`
+2. Copy the token file to your server: `scp ~/.msgvault/tokens/you@gmail.com.json user@server:~/.msgvault/tokens/`
+3. Register on the server: `msgvault add-account you@gmail.com`
+
+Run `msgvault add-account you@gmail.com --headless` to see detailed instructions with the exact paths for your configuration.
+
+### Token copied but "account not found"
+
+After copying the token, you must run `msgvault add-account you@gmail.com` on the headless server to register the account in the database. This command detects the existing token and registers the account without opening a browser.
 
 ## Rate Limiting
 

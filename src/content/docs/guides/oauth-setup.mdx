@@ -32,16 +32,14 @@ msgvault requires OAuth credentials to access the Gmail API. This guide walks th
 8. Under **Test users**, add all Gmail addresses you want to sync
 
 :::note
-The `gmail.modify` scope enables deletion features. Sync operations are read-only regardless of scope.
+The `gmail.modify` scope enables deletion features while sync operations remain read-only. When you first run `delete-staged`, msgvault will prompt you to upgrade to full `mail.google.com` access for batch deletion.
 :::
 
 ## Step 4: Create OAuth Client Credentials
 
 1. Go to **APIs & Services > Credentials**
 2. Click **Create Credentials > OAuth client ID**
-3. Choose the application type based on your environment:
-   - **Desktop application** — For machines with a browser (opens localhost callback)
-   - **TVs and Limited Input devices** — For headless servers (uses device code flow)
+3. Choose **Desktop application** as the application type
 4. Name it `msgvault` (or similar)
 5. Click **Create**
 6. Download the JSON file
@@ -51,8 +49,8 @@ The `gmail.modify` scope enables deletion features. Sync operations are read-onl
 Never commit `client_secret.json` to version control.
 :::
 
-:::note[Headless Servers]
-If you plan to use `--headless` mode on a server without a browser, you **must** choose "TVs and Limited Input devices" as the application type. The device code flow will not work with Desktop application credentials.
+:::caution[Desktop Application Only]
+You must choose **Desktop application** as the client type. Do not use "TVs and Limited Input devices" as Google's device code flow does not support Gmail scopes.
 :::
 
 ## Step 5: Configure msgvault
@@ -77,35 +75,70 @@ This opens your browser to Google's OAuth consent page. Sign in, grant access, a
 
 ## Headless Server Setup
 
-When running msgvault on a headless server (SSH, VPS, Docker), there is no browser available for the standard OAuth flow. Use the device authorization flow instead:
+When running msgvault on a headless server (SSH, VPS, Docker), there is no browser available for OAuth. Google's device code flow does not support Gmail scopes, so you must authorize on a machine with a browser and copy the token to your server.
 
-:::caution[Required: TVs and Limited Input Devices Client]
-The `--headless` flag requires OAuth credentials created with the **"TVs and Limited Input devices"** application type. If you created Desktop application credentials, you'll need to create a new OAuth client with the correct type (see Step 4 above).
-:::
+Run `--headless` to see the setup instructions:
 
 ```bash
 msgvault add-account you@gmail.com --headless
 ```
 
-This displays instructions:
+This prints:
 
 ```
-Starting device code flow...
+=== Headless Server Setup ===
 
-1. Open this URL in any browser:
-   https://www.google.com/device
+Google's OAuth device flow does not support Gmail scopes, so --headless
+cannot directly authorize. Instead, authorize on a machine with a browser
+and copy the token to your server.
 
-2. Enter this code when prompted:
-   ABC-XYZ
+Step 1: On a machine with a browser, run:
 
-Waiting for authorization...
+    msgvault add-account you@gmail.com
+
+Step 2: Copy the token file to your headless server:
+
+    ssh user@server mkdir -p '~/.msgvault/tokens'
+    scp '~/.msgvault/tokens/you@gmail.com.json' user@server:'~/.msgvault/tokens/you@gmail.com.json'
+
+Step 3: On the headless server, register the account:
+
+    msgvault add-account you@gmail.com
+
+The token will be detected and the account registered. No browser needed.
 ```
 
-1. Run the command above on the server
-2. Open `https://www.google.com/device` on any device with a browser (phone, laptop)
-3. Sign in to your Google account
-4. Enter the displayed code
-5. Grant access to msgvault
-6. The server automatically detects authorization and stores the token
+### Step-by-Step
 
-Once authorized, all other commands work normally. Tokens are stored in `~/.msgvault/tokens/you@gmail.com.json` and refreshed automatically.
+1. **On your local machine** (with a browser), install msgvault and run:
+   ```bash
+   msgvault add-account you@gmail.com
+   ```
+   Complete the OAuth flow in your browser.
+
+2. **Copy the token** to your headless server:
+   ```bash
+   ssh user@server mkdir -p ~/.msgvault/tokens
+   scp ~/.msgvault/tokens/you@gmail.com.json user@server:~/.msgvault/tokens/
+   ```
+
+3. **On the headless server**, register the account:
+   ```bash
+   msgvault add-account you@gmail.com
+   ```
+   msgvault detects the existing token and registers the account. Output:
+   ```
+   Account you@gmail.com is ready.
+   You can now run: msgvault sync-full you@gmail.com
+   ```
+
+4. **Sync your email**:
+   ```bash
+   msgvault sync-full you@gmail.com
+   ```
+
+The token file contains OAuth refresh tokens that are automatically renewed. You only need to copy it once unless you revoke access.
+
+:::note
+Both machines must have the same `client_secret.json` configured, or use the same OAuth client credentials. The token is tied to the OAuth client that created it.
+:::
