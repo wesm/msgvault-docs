@@ -14,16 +14,22 @@ msgvault add-account work@company.com
 
 All accounts share the same SQLite database and attachment storage.
 
-## Per-Account Sync
+## Syncing
 
-Sync each account independently:
+Sync all accounts at once by omitting the email argument:
+
+```bash
+# Full sync all accounts
+msgvault sync-full
+
+# Incremental sync all accounts
+msgvault sync
+```
+
+Or sync a specific account:
 
 ```bash
 msgvault sync-full personal@gmail.com
-msgvault sync-full work@company.com
-
-# Sync new and changed messages
-msgvault sync personal@gmail.com
 msgvault sync work@company.com
 ```
 

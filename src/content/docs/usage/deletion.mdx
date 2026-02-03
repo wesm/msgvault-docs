@@ -5,8 +5,6 @@ description: Staging messages for deletion, reviewing manifests, and executing d
 
 import Screenshot from '../../../components/Screenshot.astro';
 
-## Overview
-
 msgvault supports a staged deletion workflow: select messages in the TUI, review what will be deleted, then execute against Gmail. **Deletion only removes messages from Gmail's servers. Your local archive is never modified.** This means you can always search, browse, and export deleted messages from your local copy.
 
 ## Bulk Deletion via Aggregate Groups
@@ -35,8 +33,6 @@ For finer control, drill into any group and use `Space` to select individual row
 | Key | Action |
 |---|---|
 | `Space` | Toggle selection on current row |
-| `A` | Select all visible rows |
-| `x` | Clear selection |
 | `d` | Stage selected for deletion |
 | `D` | Stage all matching current filter |
 
@@ -50,6 +46,53 @@ msgvault delete-staged --list
 
 # Execute deletion (permanent)
 msgvault delete-staged --account you@gmail.com
+```
+
+## Permission Upgrade
+
+When you first run `delete-staged`, your OAuth token likely only has read and modify permissions. Batch deletion requires full Gmail access (the `mail.google.com` scope). msgvault detects this automatically and prompts you to upgrade:
+
+```
+======================================================================
+PERMISSION UPGRADE REQUIRED
+======================================================================
+
+Batch deletion requires elevated Gmail permissions.
+
+Your current OAuth token was granted with limited permissions that
+don't include batch delete. To proceed, msgvault needs to:
+
+  1. Delete your existing OAuth token
+  2. Re-authorize with full Gmail access (mail.google.com scope)
+
+This elevated permission allows msgvault to permanently delete
+messages in bulk. You can revoke access anytime at:
+  https://myaccount.google.com/permissions
+
+Upgrade permissions now? [y/N]:
+```
+
+Answering `y` opens your browser for re-authorization. Answering `N` cancels cleanly with no side effects. You can revoke the elevated permission at any time from your [Google Account permissions page](https://myaccount.google.com/permissions).
+
+If you have a legacy token from before scope tracking was added, msgvault falls back to detecting the insufficient scope from the API response and shows the same prompt.
+
+## Resumable Execution
+
+Deletions are resumable. If execution is interrupted (network error, Ctrl+C, scope error), run the same command again to pick up where it left off. Failed messages are tracked individually and retried automatically on the next run before continuing with remaining messages.
+
+## Cancelling Deletions
+
+Cancel a specific batch or all pending batches:
+
+```bash
+# List available batches
+msgvault cancel-deletion
+
+# Cancel a specific batch
+msgvault cancel-deletion <batch-id>
+
+# Cancel all pending batches
+msgvault cancel-deletion --all
 ```
 
 :::danger
