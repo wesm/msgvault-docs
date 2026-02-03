@@ -21,6 +21,10 @@ Wrong application type. Ensure you selected **Desktop app** when creating OAuth 
 
 When using `--headless`, you must have OAuth credentials created with the **"TVs and Limited Input devices"** application type. Desktop application credentials don't support the device code flow. Create a new OAuth client with the correct type in Google Cloud Console.
 
+### "invalid_scope" with --headless
+
+Google's device code flow only supports the full `mail.google.com` scope. If you see scope errors with `--headless`, ensure your OAuth consent screen includes `https://mail.google.com/` in the scopes list. Granular scopes like `gmail.readonly` or `gmail.modify` are not supported for device flow.
+
 ### General OAuth Issues
 
 1. Remove old tokens: `rm ~/.msgvault/tokens/you@gmail.com.json`

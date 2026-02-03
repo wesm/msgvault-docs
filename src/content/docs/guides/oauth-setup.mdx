@@ -27,12 +27,14 @@ msgvault requires OAuth credentials to access the Gmail API. This guide walks th
    - Developer contact email: your email
 4. Click **Save and Continue**
 5. On the Scopes page, click **Add or Remove Scopes**
-6. Add the scope: `https://www.googleapis.com/auth/gmail.modify`
+6. Add scopes based on your setup:
+   - **Desktop (browser flow):** `https://www.googleapis.com/auth/gmail.modify`
+   - **Headless (device flow):** `https://mail.google.com/` (required—device flow doesn't support granular scopes)
 7. Save and continue through the remaining screens
 8. Under **Test users**, add all Gmail addresses you want to sync
 
 :::note
-The `gmail.modify` scope enables deletion features. Sync operations are read-only regardless of scope.
+For desktop/browser flow, the `gmail.modify` scope enables deletion features while sync operations remain read-only. For headless/device flow, you must use the full `mail.google.com` scope as Google doesn't support granular scopes with device authorization.
 :::
 
 ## Step 4: Create OAuth Client Credentials
@@ -81,6 +83,10 @@ When running msgvault on a headless server (SSH, VPS, Docker), there is no brows
 
 :::caution[Required: TVs and Limited Input Devices Client]
 The `--headless` flag requires OAuth credentials created with the **"TVs and Limited Input devices"** application type. If you created Desktop application credentials, you'll need to create a new OAuth client with the correct type (see Step 4 above).
+:::
+
+:::note[Headless OAuth Scope]
+Google's device code flow only supports the full `mail.google.com` scope—it does not support granular scopes like `gmail.readonly` or `gmail.modify`. This means headless authorization grants full Gmail access, which is broader than the standard browser flow. The token works identically for all msgvault operations including deletion.
 :::
 
 ```bash
