@@ -39,10 +39,10 @@ msgvault add-account <email> --headless
 
 ## sync-full
 
-Download all messages from a Gmail account.
+Download all messages from a Gmail account. When called without an email argument, syncs all configured accounts.
 
 ```bash
-msgvault sync-full <email> [flags]
+msgvault sync-full [email] [flags]
 ```
 
 | Flag | Description |
@@ -57,10 +57,10 @@ msgvault sync-full <email> [flags]
 
 ## sync
 
-Sync new and changed messages using Gmail History API.
+Sync new and changed messages using Gmail History API. When called without an email argument, syncs all accounts that have completed an initial full sync.
 
 ```bash
-msgvault sync <email>
+msgvault sync [email]
 ```
 
 ---
@@ -200,6 +200,21 @@ msgvault mcp [flags]
 | `--force-sql` | `false` | Always use SQL retrieval instead of FTS5 |
 
 See [MCP Server](/usage/chat/) for configuration and tool reference.
+
+---
+
+## cancel-deletion
+
+Cancel pending or in-progress deletion batches. When called without a batch ID, lists available batches.
+
+```bash
+msgvault cancel-deletion [batch-id]
+msgvault cancel-deletion --all
+```
+
+| Flag | Description |
+|---|---|
+| `--all` | Cancel all pending and in-progress batches |
 
 ---
 
