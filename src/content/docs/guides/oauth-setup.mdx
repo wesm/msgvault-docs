@@ -39,14 +39,20 @@ The `gmail.modify` scope enables deletion features. Sync operations are read-onl
 
 1. Go to **APIs & Services > Credentials**
 2. Click **Create Credentials > OAuth client ID**
-3. Choose **Desktop application**
-4. Name it `msgvault Desktop Client`
+3. Choose the application type based on your environment:
+   - **Desktop application** — For machines with a browser (opens localhost callback)
+   - **TVs and Limited Input devices** — For headless servers (uses device code flow)
+4. Name it `msgvault` (or similar)
 5. Click **Create**
 6. Download the JSON file
 7. Save it as `client_secret.json` in a secure location
 
 :::caution
 Never commit `client_secret.json` to version control.
+:::
+
+:::note[Headless Servers]
+If you plan to use `--headless` mode on a server without a browser, you **must** choose "TVs and Limited Input devices" as the application type. The device code flow will not work with Desktop application credentials.
 :::
 
 ## Step 5: Configure msgvault
@@ -72,6 +78,10 @@ This opens your browser to Google's OAuth consent page. Sign in, grant access, a
 ## Headless Server Setup
 
 When running msgvault on a headless server (SSH, VPS, Docker), there is no browser available for the standard OAuth flow. Use the device authorization flow instead:
+
+:::caution[Required: TVs and Limited Input Devices Client]
+The `--headless` flag requires OAuth credentials created with the **"TVs and Limited Input devices"** application type. If you created Desktop application credentials, you'll need to create a new OAuth client with the correct type (see Step 4 above).
+:::
 
 ```bash
 msgvault add-account you@gmail.com --headless
