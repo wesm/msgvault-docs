@@ -51,23 +51,44 @@ msgvault --help
 
 Create a Google Cloud project, enable the Gmail API, and download your `client_secret.json`. See the full [OAuth Setup Guide](/guides/oauth-setup/).
 
-Create a `config.toml` file in your msgvault data directory:
+### Where to put config.toml
 
-| Platform | Config file location |
-|---|---|
-| **macOS / Linux** | `~/.msgvault/config.toml` |
-| **Windows** | `C:\Users\<you>\.msgvault\config.toml` |
+msgvault stores all data (config, database, tokens, attachments) in a single directory. The default location depends on your platform:
+
+| Platform | Data directory | Config file |
+|---|---|---|
+| **macOS / Linux** | `~/.msgvault/` | `~/.msgvault/config.toml` |
+| **Windows** | `C:\Users\<you>\.msgvault\` | `C:\Users\<you>\.msgvault\config.toml` |
 
 :::tip
-The directory is created automatically the first time you run any msgvault command. If you're unsure of the path, run `msgvault add-account` and the error message will show you the exact location.
+The `.msgvault` directory is created automatically the first time you run any msgvault command. If you're unsure of the exact path, run `msgvault add-account you@gmail.com` and the error message will show you where to create the config file.
 :::
 
+To store data on a different drive or location, set the `MSGVAULT_HOME` environment variable:
+
+**Windows (PowerShell):**
+```powershell
+$env:MSGVAULT_HOME = "E:\msgvault"
+# Or set it permanently:
+[Environment]::SetEnvironmentVariable("MSGVAULT_HOME", "E:\msgvault", "User")
+```
+
+**macOS / Linux:**
+```bash
+export MSGVAULT_HOME=/mnt/data/msgvault
+```
+
+See [Configuration](/configuration/) for all options.
+
+### Create the config file
+
+**macOS / Linux:**
 ```toml
 [oauth]
 client_secrets = "/path/to/client_secret.json"
 ```
 
-On Windows, use a full path with forward slashes or escaped backslashes:
+**Windows** — use forward slashes in the path:
 ```toml
 [oauth]
 client_secrets = "C:/Users/you/Downloads/client_secret.json"
