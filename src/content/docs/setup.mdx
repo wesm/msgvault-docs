@@ -51,11 +51,26 @@ msgvault --help
 
 Create a Google Cloud project, enable the Gmail API, and download your `client_secret.json`. See the full [OAuth Setup Guide](/guides/oauth-setup/).
 
-Create `~/.msgvault/config.toml`:
+Create a `config.toml` file in your msgvault data directory:
+
+| Platform | Config file location |
+|---|---|
+| **macOS / Linux** | `~/.msgvault/config.toml` |
+| **Windows** | `C:\Users\<you>\.msgvault\config.toml` |
+
+:::tip
+The directory is created automatically the first time you run any msgvault command. If you're unsure of the path, run `msgvault add-account` and the error message will show you the exact location.
+:::
 
 ```toml
 [oauth]
 client_secrets = "/path/to/client_secret.json"
+```
+
+On Windows, use a full path with forward slashes or escaped backslashes:
+```toml
+[oauth]
+client_secrets = "C:/Users/you/Downloads/client_secret.json"
 ```
 
 ## Add Your Account

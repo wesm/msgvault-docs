@@ -5,7 +5,14 @@ description: Configuration file reference, environment variables, and file locat
 
 ## Config File
 
-Default location: `~/.msgvault/config.toml`
+Default location:
+
+| Platform | Path |
+|---|---|
+| **macOS / Linux** | `~/.msgvault/config.toml` |
+| **Windows** | `C:\Users\<you>\.msgvault\config.toml` |
+
+Override the data directory with the `MSGVAULT_HOME` environment variable.
 
 ```toml
 [data]
@@ -56,10 +63,12 @@ Attachments and OAuth tokens are stored in subdirectories of `data_dir` (`attach
 
 ## File Locations
 
-| Path | Contents |
+All data lives under the msgvault home directory (`~/.msgvault` on macOS/Linux, `C:\Users\<you>\.msgvault` on Windows). The directory is created automatically on first use.
+
+| File | Description |
 |---|---|
-| `~/.msgvault/config.toml` | Configuration file |
-| `~/.msgvault/msgvault.db` | SQLite database (system of record) |
-| `~/.msgvault/attachments/` | Content-addressed attachment files |
-| `~/.msgvault/tokens/` | OAuth tokens per account |
-| `~/.msgvault/analytics/` | Parquet cache files for TUI |
+| `config.toml` | Configuration file |
+| `msgvault.db` | SQLite database (system of record) |
+| `attachments/` | Content-addressed attachment files |
+| `tokens/` | OAuth tokens per account |
+| `analytics/` | Parquet cache files for TUI |
