@@ -62,7 +62,7 @@ export default defineConfig({
           label: 'CLI Usage',
           items: [
             { label: 'Searching', slug: 'usage/searching' },
-            { label: 'Exporting Messages', slug: 'usage/exporting' },
+            { label: 'Exporting Data', slug: 'usage/exporting' },
             { label: 'Analytics & Stats', slug: 'usage/analytics' },
             { label: 'Deleting Email', slug: 'usage/deletion' },
             { label: 'Multi-Account', slug: 'usage/multi-account' },
