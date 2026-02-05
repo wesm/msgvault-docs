@@ -111,6 +111,40 @@ msgvault export-eml [flags]
 
 ---
 
+## export-attachment
+
+Export an attachment by its SHA-256 content hash.
+
+```bash
+msgvault export-attachment <content-hash> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `-o`, `--output <path>` | Output file path (use `-` for stdout) |
+| `--base64` | Output raw base64 to stdout |
+| `--json` | Output as JSON with base64-encoded data |
+
+See [Exporting Data](/usage/exporting/) for usage examples.
+
+---
+
+## export-attachments
+
+Export all attachments from a message as individual files.
+
+```bash
+msgvault export-attachments <message-id> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `-o`, `--output <dir>` | Output directory (default: current directory) |
+
+Accepts internal numeric IDs or Gmail message IDs. See [Exporting Data](/usage/exporting/) for usage examples.
+
+---
+
 ## verify
 
 Verify local archive integrity against Gmail.
