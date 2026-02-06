@@ -60,21 +60,26 @@ msgvault stores all data (config, database, tokens, attachments) in a single dir
 The `.msgvault` directory is created automatically the first time you run any msgvault command. If you're unsure of the exact path, run `msgvault add-account you@gmail.com` and the error message will show you where to create the config file.
 :::
 
-To store data on a different drive or location, set the `MSGVAULT_HOME` environment variable:
+To store data on a different drive or location, use the `--home` flag or set the `MSGVAULT_HOME` environment variable:
 
-**Windows (PowerShell):**
+**Per-command (any platform):**
+```bash
+msgvault sync --home E:/msgvault
+```
+
+**Windows (PowerShell, persistent):**
 ```powershell
 $env:MSGVAULT_HOME = "E:\msgvault"
 # Or set it permanently:
 [Environment]::SetEnvironmentVariable("MSGVAULT_HOME", "E:\msgvault", "User")
 ```
 
-**macOS / Linux:**
+**macOS / Linux (persistent):**
 ```bash
 export MSGVAULT_HOME=/mnt/data/msgvault
 ```
 
-See [Configuration](/configuration/) for all options.
+The `--home` flag takes priority over `MSGVAULT_HOME`. See [Configuration](/configuration/) for all options.
 
 ### Create the config file
 
