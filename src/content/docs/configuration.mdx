@@ -12,7 +12,7 @@ Default location:
 | **macOS / Linux** | `~/.msgvault/config.toml` |
 | **Windows** | `C:\Users\<you>\.msgvault\config.toml` |
 
-Override the data directory with the `MSGVAULT_HOME` environment variable.
+Override the data directory with the `MSGVAULT_HOME` environment variable or the `--home` flag (see below).
 
 ```toml
 [data]
@@ -30,6 +30,20 @@ client_secrets = "/path/to/client_secret.json"
 # Gmail API rate limit (requests per second)
 rate_limit_qps = 5
 
+```
+
+### Windows Paths
+
+TOML treats backslashes inside double-quoted strings as escape characters. On Windows, this means native paths like `"C:\Users\you\..."` will cause a parse error.
+
+Use one of these formats instead:
+
+```toml
+# Forward slashes (recommended)
+client_secrets = "C:/Users/you/Downloads/client_secret.json"
+
+# Single-quoted string (backslashes are literal)
+client_secrets = 'C:\Users\you\Downloads\client_secret.json'
 ```
 
 ## Sections
@@ -54,6 +68,22 @@ Attachments and OAuth tokens are stored in subdirectories of `data_dir` (`attach
 | Key | Default | Description |
 |---|---|---|
 | `rate_limit_qps` | `5` | Gmail API requests per second |
+
+## Overriding the Home Directory
+
+By default, msgvault stores everything under `~/.msgvault` (macOS/Linux) or `C:\Users\<you>\.msgvault` (Windows). To use a different location, you have two options:
+
+**`--home` flag** (per-command):
+```bash
+msgvault sync --home /mnt/data/msgvault
+```
+
+**`MSGVAULT_HOME` environment variable** (persistent):
+```bash
+export MSGVAULT_HOME=/mnt/data/msgvault
+```
+
+Both options are equivalent: `config.toml` is loaded from the specified directory, and all data (database, tokens, attachments) is stored there. The `--home` flag takes priority over `MSGVAULT_HOME`.
 
 ## Environment Variables
 
