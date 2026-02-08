@@ -186,6 +186,14 @@ sleep 0.5
 wait_until "Sender Name"
 sleep 0.5
 
+# Filter modal screenshot
+send "f"
+wait_until "Filter Messages"
+sleep 0.5
+capture "tui-filter-modal"
+send Enter
+sleep 0.5
+
 # 3. Domains view (cycle: Sender -> Sender Name -> Recipient -> Recipient Name -> Domain)
 send "g"
 wait_until "Sender Name"
