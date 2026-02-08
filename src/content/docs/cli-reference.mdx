@@ -9,6 +9,7 @@ description: Complete command reference for all msgvault commands.
 |---|---|
 | `--config` | Path to config file (default: `~/.msgvault/config.toml`) |
 | `--home` | Home directory for all data (overrides `MSGVAULT_HOME`) |
+| `-v`, `--verbose` | Verbose output |
 | `--help` | Show help |
 
 ---
@@ -35,6 +36,7 @@ msgvault add-account <email> --headless
 | Flag | Description |
 |---|---|
 | `--headless` | Show instructions for headless server setup |
+| `--display-name` | Set a display name for the account |
 
 ---
 
@@ -212,6 +214,8 @@ msgvault list-labels
 
 ## build-cache
 
+(alias: `build-parquet`)
+
 Build or update the Parquet analytics cache.
 
 ```bash
@@ -221,6 +225,18 @@ msgvault build-cache [flags]
 | Flag | Description |
 |---|---|
 | `--full-rebuild` | Discard existing cache and rebuild |
+
+---
+
+## cache-stats
+
+(alias: `parquet-stats`)
+
+Show statistics about the analytics cache.
+
+```bash
+msgvault cache-stats
+```
 
 ---
 
@@ -252,6 +268,68 @@ The `serve` command has no CLI flags. All configuration (port, bind address, API
 
 ---
 
+## show-message
+
+Show full message details.
+
+```bash
+msgvault show-message <id> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--json` | Output as JSON |
+
+---
+
+## list-accounts
+
+List synced email accounts.
+
+```bash
+msgvault list-accounts [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--json` | Output as JSON |
+
+---
+
+## update-account
+
+Update account settings.
+
+```bash
+msgvault update-account <email> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--display-name` | Set a display name for the account |
+
+---
+
+## list-deletions
+
+List pending and recent deletion batches.
+
+```bash
+msgvault list-deletions
+```
+
+---
+
+## show-deletion
+
+Show details of a deletion batch.
+
+```bash
+msgvault show-deletion <batch-id>
+```
+
+---
+
 ## cancel-deletion
 
 Cancel pending or in-progress deletion batches. When called without a batch ID, lists available batches.
@@ -267,10 +345,53 @@ msgvault cancel-deletion --all
 
 ---
 
+## delete-staged
+
+Execute staged deletions. This permanently deletes messages from Gmail.
+
+```bash
+msgvault delete-staged [batch-id] [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `-y`, `--yes` | Skip confirmation prompt |
+| `--dry-run` | Show what would be deleted without deleting |
+| `-l`, `--list` | List staged deletion batches |
+| `--account` | Filter to a specific account |
+
+---
+
 ## repair-encoding
 
 Fix UTF-8 encoding issues in existing messages.
 
 ```bash
 msgvault repair-encoding
+```
+
+---
+
+## update
+
+Update msgvault to the latest version.
+
+```bash
+msgvault update [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--check` | Check for updates without installing |
+| `-y`, `--yes` | Skip confirmation prompt |
+| `-f`, `--force` | Force update even if already on the latest version |
+
+---
+
+## quickstart
+
+Print a quickstart guide for AI agents.
+
+```bash
+msgvault quickstart
 ```
