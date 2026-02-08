@@ -22,7 +22,7 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Currently supports Gmail, with WhatsApp and other messaging platforms planned.
+Currently supports Gmail, with IMAP support and MBOX import coming soon. WhatsApp and other messaging platforms are also planned.
 
 Read the [Introduction](/introduction/) to learn more about why this project was created.
 
@@ -30,6 +30,11 @@ Read the [Introduction](/introduction/) to learn more about why this project was
 
 ```bash
 curl -fsSL https://msgvault.io/install.sh | bash
+```
+
+**Windows (PowerShell):**
+```powershell
+powershell -ExecutionPolicy ByPass -c "irm https://msgvault.io/install.ps1 | iex"
 ```
 
 Then [set up OAuth credentials](/guides/oauth-setup/) and [start syncing](/setup/). You can also [build from source](/setup/#build-from-source).
