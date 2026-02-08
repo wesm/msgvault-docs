@@ -99,6 +99,17 @@ Search also works after drill-down. Drill into a result, then press `/` again to
   <Screenshot src="/tui-search-subject.svg" alt="Searching within a sender's messages by subject keyword with highlighted matches" />
 </div>
 
+## Filtering
+
+Press `f` to open the filter modal. The modal presents two independent toggles that you can combine:
+
+| Filter | Effect |
+|---|---|
+| Only with attachments | Show only messages that have attachments |
+| Hide deleted from source | Exclude messages that have been deleted from Gmail |
+
+Use `↑`/`↓` to navigate, `Space` or `x` to toggle a filter, and `Enter` or `Esc` to apply and close. Active filters are shown in the title bar (e.g. `[Attachments]`, `[Hide Deleted]`). Filters apply to all views: aggregates, drill-downs, sub-aggregates, search results, and stats.
+
 ## Viewing Email Threads
 
 From any message list (after drilling into a sender, label, domain, etc.), press `T` to open the full email thread for the highlighted message. This renders the complete conversation inline in the terminal, including sender, date, and body text for each message in the thread.
@@ -121,7 +132,7 @@ Press `Esc` to return to the message list.
 | `t` | Jump to Time view (cycle granularity when already in Time) |
 | `a` | Show all individual messages in current view |
 | `A` | Filter by account |
-| `f` | Filter by attachments |
+| `f` | Open filter modal |
 | `Space` | Toggle selection |
 | `d` | Stage selected for deletion |
 | `D` | Stage all matching current filter |
