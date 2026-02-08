@@ -504,7 +504,6 @@ def create_demo_thread(
     conn: sqlite3.Connection,
     source_id: int,
     account_pid: int,
-    contact_ids: list[int],
     label_map: dict[tuple[int, str], int],
 ) -> None:
     """Create a curated 10-message email thread for the thread view screenshot."""
@@ -735,7 +734,7 @@ def populate(conn: sqlite3.Connection) -> None:
                 )
 
     # --- Curated email thread for screenshot demos ---
-    create_demo_thread(conn, source_ids[0], account_participant_ids[0], contact_ids, label_map)
+    create_demo_thread(conn, source_ids[0], account_participant_ids[0], label_map)
 
     # Populate conversation_participants from messages + recipients
     conn.execute("""

@@ -40,6 +40,10 @@ def load_attachments(db_path: Path) -> pd.DataFrame:
     if not db_path.exists():
         raise FileNotFoundError(f"Database not found at {db_path}.")
     con = duckdb.connect()
+    try:
+        con.execute("LOAD sqlite;")
+    except duckdb.IOException:
+        con.execute("INSTALL sqlite; LOAD sqlite;")
     df = con.sql(f"""
         SELECT filename, mime_type, size
         FROM sqlite_scan('{db_path}', 'attachments')
@@ -124,6 +128,11 @@ def main():
     args = parser.parse_args()
 
     df = load_attachments(args.db)
+
+    if df.empty:
+        print("No attachments found in database.")
+        return
+
     df["type"] = df.apply(classify_attachment, axis=1)
 
     counts = (
@@ -166,7 +175,9 @@ def main():
         p.save(args.output, dpi=150)
         print(f"Saved to {args.output}")
     else:
-        print(p)
+        print("No --output specified. Use --output <file> to save the chart.")
+        p.save("attachment_types.png", dpi=150)
+        print("Saved to attachment_types.png")
 
 
 if __name__ == "__main__":

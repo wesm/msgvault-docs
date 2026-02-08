@@ -57,10 +57,10 @@ msgvault stores all data (config, database, tokens, attachments) in a single dir
 | **Windows** | `C:\Users\<you>\.msgvault\` | `C:\Users\<you>\.msgvault\config.toml` |
 
 :::tip
-The `.msgvault` directory is created automatically the first time you run any msgvault command. If you're unsure of the exact path, run `msgvault add-account you@gmail.com` and the error message will show you where to create the config file.
+The `.msgvault` directory is created automatically the first time you run any msgvault command. If you're unsure of the exact path, run `msgvault add-account you@gmail.com`; the error message may show you where to create the config file.
 :::
 
-To store data on a different drive or location, use the `--home` flag or set the `MSGVAULT_HOME` environment variable:
+To store data on a different drive or location, use the `--home` flag or set the `MSGVAULT_HOME` environment variable. If `MSGVAULT_HOME` is set, paths in the table above are relative to that directory instead:
 
 **Per-command (any platform):**
 ```bash
