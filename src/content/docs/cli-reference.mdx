@@ -240,6 +240,18 @@ See [MCP Server](/usage/chat/) for configuration and tool reference.
 
 ---
 
+## serve
+
+Start the web server with optional background sync scheduling.
+
+```bash
+msgvault serve
+```
+
+The `serve` command has no CLI flags. All configuration (port, bind address, API key, CORS, account schedules) is read from your `config.toml`. See [Web Server](/api-server/) for endpoint documentation and [Configuration](/configuration/#server) for config options.
+
+---
+
 ## cancel-deletion
 
 Cancel pending or in-progress deletion batches. When called without a batch ID, lists available batches.

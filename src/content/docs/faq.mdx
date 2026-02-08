@@ -24,13 +24,17 @@ However, you should be aware of prompt injection risks. If an adversary can infl
 
 The MCP server's lack of sync capability offers some protection here, since an agent cannot pull new messages on demand. But this project does not claim to be immune to LLM security issues. Users are ultimately responsible for their own security setup and for understanding the risks of giving LLMs access to sensitive data.
 
+<p class="faq-question">What is the web server for?</p>
+
+`msgvault serve` starts a web server that lets you query your archive programmatically via a REST API. It is useful for building dashboards, running automations, or integrating with other tools. The server can also run background sync on a cron schedule to keep your archive up to date. See [Web Server](/api-server/) for details.
+
 <p class="faq-question">Where is my email data stored?</p>
 
 Everything stays on your local machine. msgvault stores messages in a SQLite database and Parquet analytics files inside your `MSGVAULT_HOME` directory (defaults to `~/.msgvault`). No data is sent to any remote server. See [Data Storage](/architecture/storage/) for details.
 
 <p class="faq-question">Can I use msgvault with non-Gmail accounts?</p>
 
-Not yet. msgvault currently supports Gmail only. Support for other providers via IMAP is being considered for future releases.
+Not yet. msgvault currently supports Gmail only. Support for other providers via IMAP and MBOX import is being considered for future releases.
 
 <p class="faq-question">Does deleting email in msgvault delete it from Gmail?</p>
 
