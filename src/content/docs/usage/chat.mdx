@@ -35,13 +35,13 @@ The MCP server exposes the following tools to connected AI clients:
 
 | Tool | Description | Parameters |
 |---|---|---|
-| `search_messages` | Full-text search with Gmail-like query syntax | `query` (string, required), `limit` (int), `offset` (int) |
+| `search_messages` | Full-text search with Gmail-like query syntax | `query` (string, required), `limit` (int), `offset` (int), `account` (string) |
 | `get_message` | Get full message details by ID | `id` (int) |
-| `list_messages` | List messages with filters | `from` (string), `to` (string), `label` (string), `after` (string), `before` (string), `has_attachment` (bool), `limit` (int), `offset` (int) |
+| `list_messages` | List messages with filters | `from` (string), `to` (string), `label` (string), `after` (string), `before` (string), `has_attachment` (bool), `limit` (int), `offset` (int), `account` (string) |
 | `get_attachment` | Get attachment content by ID | `attachment_id` (int) |
 | `export_attachment` | Save attachment to filesystem | `attachment_id` (int), `destination` (string) |
 | `get_stats` | Archive overview statistics | — |
-| `aggregate` | Grouped statistics (top senders, domains, labels, time series) | `group_by` (string: sender/recipient/domain/label/time), `limit` (int), `after` (string), `before` (string) |
+| `aggregate` | Grouped statistics (top senders, domains, labels, time series) | `group_by` (string: sender/recipient/domain/label/time), `limit` (int), `after` (string), `before` (string), `account` (string) |
 
 ## Example Usage with Claude
 
