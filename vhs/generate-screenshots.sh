@@ -36,9 +36,11 @@ wait_until() {
 }
 
 # --- Start tmux session ---
-tmux -f /dev/null new-session -d -s "$SESSION" -x 120 -y 40
+# Set terminal options before creating the session so the pane inherits them
+tmux -f /dev/null start-server
 tmux set-option -g default-terminal "tmux-256color"
 tmux set-option -ga terminal-overrides ",*:Tc"
+tmux new-session -d -s "$SESSION" -x 120 -y 40
 tmux send-keys -t "$SESSION" "export COLORTERM=truecolor" Enter
 sleep 0.3
 
@@ -48,7 +50,7 @@ sleep 0.3
 echo "==> TUI screenshots"
 
 send "MSGVAULT_HOME=/data msgvault tui" Enter
-wait_until "Sender"
+wait_until "Sender Name"
 
 # 1. Senders view (default)
 sleep 0.5
@@ -62,7 +64,8 @@ capture "tui-all-messages"
 
 # Message detail: press Enter to view a message
 send Enter
-sleep 1
+wait_until "Subject:"
+sleep 0.5
 capture "tui-message-detail"
 
 # Back to senders
@@ -70,7 +73,7 @@ send Escape
 sleep 0.5
 send Escape
 sleep 0.5
-wait_until "Sender"
+wait_until "Sender Name"
 sleep 0.5
 
 # 2. Drill into a sender
@@ -96,7 +99,7 @@ send -l "sarah.benson"
 sleep 1.5
 send Enter
 sleep 0.5
-wait_until "benson"
+wait_until "sarah.benson@company.io"
 
 # Drill into Sarah Benson
 send Enter
@@ -115,7 +118,7 @@ send Escape
 sleep 0.5
 send Escape
 sleep 0.5
-wait_until "Sender"
+wait_until "Sender Name"
 sleep 0.5
 
 # Sub-grouping: drill into a sender first, then press g to re-aggregate
@@ -129,11 +132,11 @@ send Enter
 wait_until "Date"
 sleep 0.5
 send "g"
-wait_until "Recipient"
+wait_until "Recipient Name"
 sleep 0.5
 capture "tui-subgroup-recipients"
 
-# Switch to time grouping
+# Switch to time grouping (t jumps directly to Time from any view)
 send "t"
 wait_until "Time"
 sleep 0.5
@@ -146,7 +149,7 @@ send Escape
 sleep 1
 
 # --- Search screenshots (at top-level Senders) ---
-wait_until "Sender"
+wait_until "Sender Name"
 
 # Search for a sender
 send "/"
@@ -156,7 +159,7 @@ sleep 1.5
 # Enter to confirm/fix the search
 send Enter
 sleep 0.5
-wait_until "benson"
+wait_until "benson@"
 capture "tui-search-sender"
 
 # Drill into the benson result
@@ -180,15 +183,26 @@ send Escape
 sleep 0.5
 send Escape
 sleep 0.5
-wait_until "Sender"
+wait_until "Sender Name"
+sleep 0.5
+
+# Filter modal screenshot
+send "f"
+wait_until "Filter Messages"
+sleep 0.5
+capture "tui-filter-modal"
+send Enter
 sleep 0.5
 
 # 3. Domains view (cycle: Sender -> Sender Name -> Recipient -> Recipient Name -> Domain)
 send "g"
+wait_until "Sender Name"
 sleep 0.3
 send "g"
+wait_until "Recipient"
 sleep 0.3
 send "g"
+wait_until "Recipient Name"
 sleep 0.3
 send "g"
 wait_until "Domain"
@@ -221,7 +235,7 @@ capture "tui-time-yearly"
 # 6. Multi-row selection (back to Sender first)
 # From Time, cycle: Sender
 send "g"
-wait_until "Sender"
+wait_until "Sender Name"
 sleep 0.5
 send Down
 sleep 0.3

@@ -61,7 +61,7 @@ Create `config.toml` in your msgvault data directory:
 - **Windows:** `C:\Users\<you>\.msgvault\config.toml`
 
 :::tip
-The `.msgvault` directory is created automatically the first time you run any msgvault command. If you're unsure of the exact path, run `msgvault add-account you@gmail.com` and the error message will show you where to create the config file.
+The `.msgvault` directory is created automatically the first time you run any msgvault command. If you're unsure of the exact path, run `msgvault add-account you@gmail.com`; the error message may show you where to create the config file.
 :::
 
 ```toml
@@ -111,8 +111,8 @@ Step 1: On a machine with a browser, run:
 
 Step 2: Copy the token file to your headless server:
 
-    ssh user@server mkdir -p '~/.msgvault/tokens'
-    scp '~/.msgvault/tokens/you@gmail.com.json' user@server:'~/.msgvault/tokens/you@gmail.com.json'
+    ssh user@server 'mkdir -p ~/.msgvault/tokens'
+    scp ~/.msgvault/tokens/you@gmail.com.json user@server:~/.msgvault/tokens/
 
 Step 3: On the headless server, register the account:
 

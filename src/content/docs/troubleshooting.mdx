@@ -114,6 +114,25 @@ If the TUI launches but shows no data:
 2. Rebuild the Parquet cache: `msgvault build-cache --full-rebuild`
 3. Check account filter: try `msgvault tui` without `--account`
 
+## Web Server Issues
+
+### "api_key is required for non-loopback bind address"
+
+You set `bind_addr` to a non-loopback address (e.g., `0.0.0.0`) without configuring an API key. Either add an `api_key` to your `[server]` config, or set `allow_insecure = true` if you understand the security implications. See [Web Server: Security Model](/api-server/#security-model).
+
+### Port already in use
+
+Another process is using the configured port. Either stop the other process, or change `api_port` in your `[server]` config:
+
+```toml
+[server]
+api_port = 9090
+```
+
+### HTTP 429 Too Many Requests
+
+The API server enforces a rate limit of 10 requests per second per client IP. If you are hitting this limit, space out your requests or check the `Retry-After` response header for the wait duration.
+
 ## Still Stuck?
 
 Ask for help on the [msgvault Discord server](https://discord.gg/fDnmxB8Wkq) or [open an issue on GitHub](https://github.com/wesm/msgvault/issues).

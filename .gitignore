@@ -7,4 +7,4 @@ dist/
 
 vhs/demo-data
 vhs/tapes/output/
-*.png
+scripts/output/*.png

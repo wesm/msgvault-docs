@@ -30,6 +30,17 @@ client_secrets = "/path/to/client_secret.json"
 # Gmail API rate limit (requests per second)
 rate_limit_qps = 5
 
+[server]
+# API server settings (used by `msgvault serve`)
+api_port = 8080
+bind_addr = "127.0.0.1"
+api_key = "your-secret-key"
+
+# Scheduled sync accounts
+[[accounts]]
+email = "you@gmail.com"
+schedule = "0 * * * *"
+enabled = true
 ```
 
 ### Windows Paths
@@ -68,6 +79,30 @@ Attachments and OAuth tokens are stored in subdirectories of `data_dir` (`attach
 | Key | Default | Description |
 |---|---|---|
 | `rate_limit_qps` | `5` | Gmail API requests per second |
+
+### `[server]`
+
+Settings for the web server started by `msgvault serve`. See [Web Server](/api-server/) for endpoint documentation.
+
+| Key | Default | Description |
+|---|---|---|
+| `api_port` | `8080` | Port the server listens on |
+| `bind_addr` | `127.0.0.1` | Bind address |
+| `api_key` | — | API key for authentication |
+| `allow_insecure` | `false` | Allow non-loopback binding without `api_key` |
+| `cors_origins` | `[]` | Allowed CORS origins |
+| `cors_credentials` | `false` | Allow credentials in CORS requests |
+| `cors_max_age` | `0` | CORS preflight cache duration in seconds |
+
+### `[[accounts]]`
+
+Scheduled sync accounts for the web server. Each `[[accounts]]` entry defines a cron schedule for automatic background syncing.
+
+| Key | Default | Description |
+|---|---|---|
+| `email` | (required) | Gmail account email address |
+| `schedule` | — | Cron expression for sync schedule (e.g., `0 * * * *`) |
+| `enabled` | `true` | Whether scheduled sync is active for this account |
 
 ## Overriding the Home Directory
 

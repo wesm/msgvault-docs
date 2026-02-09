@@ -1,0 +1,320 @@
+---
+title: Web Server
+description: REST API for programmatic access to your msgvault archive, with optional background sync scheduling.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+## Overview
+
+`msgvault serve` starts an HTTP server that exposes your local email archive over a REST API. It optionally runs a background sync scheduler to keep accounts up to date on a cron-based schedule.
+
+All data stays local. The API queries the same SQLite database and attachment store as the CLI and TUI. The server is designed for local integrations, dashboards, and automation scripts.
+
+## Quick Start
+
+Add a `[server]` section to your `config.toml`:
+
+```toml
+[server]
+api_port = 8080
+api_key = "your-secret-key"
+```
+
+Start the server:
+
+```bash
+msgvault serve
+```
+
+Test connectivity:
+
+```bash
+# Health check (no auth required)
+curl http://localhost:8080/health
+
+# Archive stats (auth required)
+curl -H "Authorization: Bearer your-secret-key" http://localhost:8080/api/v1/stats
+```
+
+## Authentication
+
+All endpoints except `/health` require authentication when `api_key` is set in your config. Three authentication methods are supported:
+
+| Method | Header | Example |
+|---|---|---|
+| Bearer token | `Authorization: Bearer <key>` | `Authorization: Bearer my-secret` |
+| API key header | `X-API-Key: <key>` | `X-API-Key: my-secret` |
+| Plain auth header | `Authorization: <key>` | `Authorization: my-secret` |
+
+If no `api_key` is configured and the server is bound to a loopback address (`127.0.0.1` or `::1`), authentication is not required.
+
+## API Endpoints
+
+### GET `/health`
+
+Health check endpoint. Does not require authentication.
+
+**Response:**
+
+```json
+{"status": "ok"}
+```
+
+---
+
+### GET `/api/v1/stats`
+
+Archive statistics.
+
+**Response:**
+
+```json
+{
+  "total_messages": 142857,
+  "total_threads": 48293,
+  "total_accounts": 2,
+  "total_labels": 47,
+  "total_attachments": 31204,
+  "database_size_bytes": 8589934592
+}
+```
+
+---
+
+### GET `/api/v1/messages`
+
+Paginated message list.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `page` | int | `1` | Page number |
+| `page_size` | int | `50` | Results per page |
+
+**Response:**
+
+```json
+{
+  "total": 142857,
+  "page": 1,
+  "page_size": 50,
+  "messages": [
+    {
+      "id": 12345,
+      "subject": "Q4 Planning",
+      "from": "alice@example.com",
+      "to": "bob@example.com",
+      "sent_at": "2024-10-15T09:30:00Z",
+      "snippet": "Here's the draft for Q4...",
+      "labels": ["INBOX", "IMPORTANT"],
+      "has_attachments": true,
+      "size_bytes": 52480
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/v1/messages/{id}`
+
+Full message details including body and attachment metadata.
+
+**Response:**
+
+```json
+{
+  "id": 12345,
+  "subject": "Q4 Planning",
+  "from": "alice@example.com",
+  "to": "bob@example.com",
+  "sent_at": "2024-10-15T09:30:00Z",
+  "snippet": "Here's the draft for Q4...",
+  "labels": ["INBOX", "IMPORTANT"],
+  "has_attachments": true,
+  "size_bytes": 52480,
+  "body": "<full message body>",
+  "attachments": [
+    {
+      "filename": "q4-plan.pdf",
+      "mime_type": "application/pdf",
+      "size_bytes": 204800
+    }
+  ]
+}
+```
+
+---
+
+### GET `/api/v1/search`
+
+Full-text search using the same query syntax as `msgvault search`.
+
+| Parameter | Type | Default | Description |
+|---|---|---|---|
+| `q` | string | (required) | Search query |
+| `page` | int | `1` | Page number |
+| `page_size` | int | `50` | Results per page |
+
+**Response:**
+
+```json
+{
+  "query": "quarterly report",
+  "total": 23,
+  "page": 1,
+  "page_size": 50,
+  "messages": [
+    {
+      "id": 12345,
+      "subject": "Q4 Planning",
+      "from": "alice@example.com",
+      "to": "bob@example.com",
+      "sent_at": "2024-10-15T09:30:00Z",
+      "snippet": "Here's the draft for Q4...",
+      "labels": ["INBOX", "IMPORTANT"],
+      "has_attachments": true,
+      "size_bytes": 52480
+    }
+  ]
+}
+```
+
+See [Searching](/usage/searching/) for the full query syntax reference.
+
+---
+
+### GET `/api/v1/accounts`
+
+List configured accounts with sync status.
+
+**Response:**
+
+```json
+{
+  "accounts": [
+    {
+      "email": "you@gmail.com",
+      "display_name": "Your Name",
+      "last_sync_at": "2024-10-15T08:00:00Z",
+      "next_sync_at": "2024-10-15T09:00:00Z",
+      "schedule": "0 * * * *",
+      "enabled": true
+    }
+  ]
+}
+```
+
+---
+
+### POST `/api/v1/sync/{account}`
+
+Trigger a manual sync for an account. Returns immediately with a 202 status while the sync runs in the background.
+
+**Response (202 Accepted):**
+
+```json
+{
+  "status": "accepted",
+  "message": "sync started for you@gmail.com"
+}
+```
+
+---
+
+### GET `/api/v1/scheduler/status`
+
+Scheduler state and per-account schedule details.
+
+**Response:**
+
+```json
+{
+  "running": true,
+  "accounts": [
+    {
+      "email": "you@gmail.com",
+      "running": false,
+      "last_run": "2024-10-15T08:00:00Z",
+      "next_run": "2024-10-15T09:00:00Z",
+      "schedule": "0 * * * *",
+      "last_error": null
+    }
+  ]
+}
+```
+
+## Rate Limiting
+
+The API enforces rate limiting of 10 requests per second per client IP, with a burst allowance of 20 requests. When the limit is exceeded, the server responds with HTTP 429 and includes a `Retry-After` header indicating how long to wait before retrying.
+
+## CORS
+
+Cross-Origin Resource Sharing is disabled by default. To allow browser-based clients, configure allowed origins in your `config.toml`:
+
+```toml
+[server]
+cors_origins = ["http://localhost:3000", "https://my-dashboard.example.com"]
+cors_credentials = true
+cors_max_age = 3600
+```
+
+## Scheduled Sync
+
+The server can automatically sync accounts on a cron-based schedule. Add `[[accounts]]` sections to your config:
+
+```toml
+[[accounts]]
+email = "you@gmail.com"
+schedule = "0 * * * *"    # every hour
+enabled = true
+
+[[accounts]]
+email = "work@gmail.com"
+schedule = "*/15 * * * *" # every 15 minutes
+enabled = true
+```
+
+The scheduler starts automatically with `msgvault serve` when account schedules are configured. Use the `/api/v1/scheduler/status` endpoint to monitor schedule state, and `/api/v1/sync/{account}` to trigger a manual sync outside the schedule.
+
+<Aside type="note">
+Each account must have completed an initial full sync (`msgvault sync-full`) before scheduled sync will work. The scheduler runs incremental syncs only.
+</Aside>
+
+## Security Model
+
+The server is designed for local use:
+
+- **Loopback-only by default.** The default bind address is `127.0.0.1`, restricting access to the local machine.
+- **API key required for non-loopback.** If you bind to a non-loopback address (e.g., `0.0.0.0`), the server requires `api_key` to be set and will refuse to start without it.
+- **Opt-in for insecure binding.** To bind to a non-loopback address without an API key (not recommended), set `allow_insecure = true`.
+
+<Aside type="caution">
+Exposing the server on a network without authentication gives anyone on that network access to your entire email archive. Always set an `api_key` when binding to non-loopback addresses.
+</Aside>
+
+## Configuration Reference
+
+All server settings go in the `[server]` section of `config.toml`. Account schedules use `[[accounts]]` sections.
+
+### `[server]`
+
+| Key | Default | Description |
+|---|---|---|
+| `api_port` | `8080` | Port the server listens on |
+| `bind_addr` | `127.0.0.1` | Bind address |
+| `api_key` | — | API key for authentication |
+| `allow_insecure` | `false` | Allow non-loopback binding without `api_key` |
+| `cors_origins` | `[]` | Allowed CORS origins |
+| `cors_credentials` | `false` | Allow credentials in CORS requests |
+| `cors_max_age` | `0` | CORS preflight cache duration in seconds |
+
+### `[[accounts]]`
+
+| Key | Default | Description |
+|---|---|---|
+| `email` | (required) | Gmail account email address |
+| `schedule` | — | Cron expression for sync schedule |
+| `enabled` | `true` | Whether scheduled sync is active |
+
+See the [Configuration](/configuration/) page for the full config file reference.

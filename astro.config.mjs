@@ -61,6 +61,7 @@ export default defineConfig({
         { label: 'Configuration', slug: 'configuration' },
         { label: 'CLI Reference', slug: 'cli-reference' },
         { label: 'MCP Server', slug: 'usage/chat' },
+        { label: 'Web Server', slug: 'api-server' },
         {
           label: 'CLI Usage',
           items: [
