@@ -63,6 +63,106 @@ Run `msgvault add-account you@gmail.com --headless` to see detailed instructions
 
 After copying the token, you must run `msgvault add-account you@gmail.com` on the headless server to register the account in the database. This command detects the existing token and registers the account without opening a browser.
 
+## Remote Deployment Issues
+
+### `export-token` says HTTPS is required
+
+`msgvault export-token` enforces HTTPS by default. Most deployments use Tailscale or a home LAN where HTTP is fine — add `--allow-insecure`:
+
+```bash
+msgvault export-token you@gmail.com --to http://nas-ip:8080 --api-key KEY --allow-insecure
+```
+
+To avoid passing the flag every time, run `msgvault setup` with a remote server configured (it sets `allow_insecure = true` in your local config automatically), or add it manually:
+
+```toml
+[remote]
+allow_insecure = true
+```
+
+### `export-token` returns 401/Forbidden
+
+1. Verify your remote server has an `api_key` in `[server]`.
+2. Confirm `MSGVAULT_REMOTE_API_KEY` / `--api-key` matches that value.
+3. Ensure the remote endpoint is reachable from the local machine.
+
+### Remote command behaves unexpectedly
+
+Commands that support remote mode (`search`, `show-message`, `stats`, `list-accounts`) can be triggered unintentionally when `[remote].url` is set.
+
+Use `--local` when you want to force local SQLite:
+
+```bash
+msgvault search from:alice@example.com --local
+msgvault list-accounts --local
+```
+
+## Docker Container Issues
+
+### Container won't start
+
+Check logs first:
+
+```bash
+docker logs msgvault
+```
+
+Common causes:
+- Missing `config.toml` with `[oauth] client_secrets` and `[server] bind_addr = "0.0.0.0"` + `api_key`
+- Port 8080 already in use — change `api_port` in config or the port mapping in docker-compose.yml
+- Volume mount permissions — on Synology, add `user: root` to docker-compose.yml (see [Platform Notes](/guides/remote-deployment/#platform-notes))
+
+### `permission denied` on Synology
+
+Synology ACLs override standard Unix permissions. Add `user: root` to your docker-compose.yml:
+
+```yaml
+services:
+  msgvault:
+    image: ghcr.io/wesm/msgvault:latest
+    user: root
+    # ... rest of config
+```
+
+### Scheduled sync not running
+
+1. Verify accounts are configured in `config.toml`:
+   ```toml
+   [[accounts]]
+   email = "you@gmail.com"
+   schedule = "0 2 * * *"
+   enabled = true
+   ```
+
+2. Verify the token exists:
+   ```bash
+   docker exec msgvault ls -la /data/tokens/
+   ```
+
+3. Check scheduler status:
+   ```bash
+   curl -H "X-API-Key: KEY" http://localhost:8080/api/v1/scheduler/status
+   ```
+
+4. Make sure you've run the initial full sync — the scheduler only runs incremental syncs:
+   ```bash
+   docker exec msgvault msgvault sync-full you@gmail.com
+   ```
+
+### "No source found for email"
+
+The account isn't registered in the database. Re-export the token from your local machine:
+
+```bash
+msgvault export-token you@gmail.com --to http://nas-ip:8080 --api-key KEY --allow-insecure
+```
+
+This uploads the token and registers the account. If the token file already exists on the server, register it directly:
+
+```bash
+docker exec msgvault msgvault add-account you@gmail.com
+```
+
 ## Rate Limiting
 
 If you hit Gmail API rate limits during large syncs:

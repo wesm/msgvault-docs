@@ -8,12 +8,10 @@ import Screenshot from '../../../components/Screenshot.astro';
 ## Launch
 
 ```bash
-# Launch the TUI
 msgvault tui
-
-# Filter by account
-msgvault tui --account you@gmail.com
 ```
+
+The TUI currently requires a local database — it does not support [remote servers](/guides/remote-deployment/). Remote TUI support is planned for a future release. For now, use the CLI commands (`search`, `stats`, etc.) which work in remote mode, or SSH into the remote host and run `msgvault tui` there.
 
 The TUI automatically builds or updates the Parquet analytics cache on launch when new messages are detected.
 

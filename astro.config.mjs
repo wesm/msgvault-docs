@@ -76,7 +76,8 @@ export default defineConfig({
           label: 'Guides',
           items: [
             { label: 'Google OAuth Setup', slug: 'guides/oauth-setup' },
-{ label: 'Verify Integrity', slug: 'guides/verification' },
+            { label: 'Remote Deployment', slug: 'guides/remote-deployment' },
+            { label: 'Verify Integrity', slug: 'guides/verification' },
           ],
         },
         {
@@ -86,6 +87,7 @@ export default defineConfig({
             { label: 'Data Storage', slug: 'architecture/storage' },
           ],
         },
+        { label: 'Changelog', slug: 'changelog' },
         { label: 'Troubleshooting', slug: 'troubleshooting' },
         { label: 'Development', slug: 'development' },
         { label: 'FAQ', slug: 'faq' },

@@ -103,6 +103,8 @@ msgvault add-account you@gmail.com
 
 This opens your browser for OAuth consent. For headless servers, see the [copy-token workflow](/guides/oauth-setup/#headless-server-setup).
 
+If you plan to deploy to a remote host (NAS, cloud VM, etc.), run `msgvault setup` after this step to generate a ready-to-run deployment bundle with Docker Compose and remote configuration. See the [Remote Deployment](/guides/remote-deployment/) guide.
+
 ## Sync Email
 
 ```bash
@@ -129,6 +131,7 @@ The good news: syncs are resumable (see below), and once the initial sync is com
 | `--limit N` | Download at most N messages |
 | `--after YYYY-MM-DD` | Only messages after this date |
 | `--before YYYY-MM-DD` | Only messages before this date |
+| `--query` | Gmail search query filter |
 | `--noresume` | Start fresh instead of resuming |
 | `--verbose` | Show detailed progress |
 

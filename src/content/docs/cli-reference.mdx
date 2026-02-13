@@ -10,6 +10,7 @@ description: Complete command reference for all msgvault commands.
 | `--config` | Path to config file (default: `~/.msgvault/config.toml`) |
 | `--home` | Home directory for all data (overrides `MSGVAULT_HOME`) |
 | `-v`, `--verbose` | Verbose output |
+| `--local` | Force local database mode when `[remote]` is configured |
 | `--help` | Show help |
 
 ---
@@ -53,6 +54,7 @@ msgvault sync-full [email] [flags]
 | `--limit N` | Maximum messages to download |
 | `--after YYYY-MM-DD` | Only messages after this date |
 | `--before YYYY-MM-DD` | Only messages before this date |
+| `--query` | Gmail search query filter |
 | `--noresume` | Ignore checkpoints, start fresh |
 | `--verbose` | Detailed progress output |
 
@@ -78,6 +80,8 @@ msgvault search <query> [flags]
 
 | Flag | Description |
 |---|---|
+| `-n`, `--limit N` | Maximum number of results (default: 50) |
+| `--offset N` | Skip first N results |
 | `--json` | Output results as JSON |
 
 See [Searching](/usage/searching/) for the full operator reference.
@@ -94,23 +98,22 @@ msgvault tui [flags]
 
 | Flag | Description |
 |---|---|
-| `--account <email>` | Filter to a specific account |
+| `--force-sql` | Force SQLite queries instead of Parquet |
+| `--no-cache-build` | Skip automatic cache build/update |
 
 ---
 
 ## export-eml
 
-Export a message as a `.eml` file.
+Export a message as a `.eml` file. Accepts either a numeric database ID or a Gmail message ID.
 
 ```bash
-msgvault export-eml [flags]
+msgvault export-eml <id> [flags]
 ```
 
 | Flag | Description |
 |---|---|
-| `--message-id N` | Internal database message ID |
-| `--gmail-id <hex>` | Gmail message ID |
-| `--output <path>` | Output file (default: stdout) |
+| `-o`, `--output <path>` | Output file (default: `<gmail_id>.eml`, use `-` for stdout) |
 
 ---
 
@@ -150,6 +153,26 @@ Accepts internal numeric IDs or Gmail message IDs. See [Exporting Data](/usage/e
 
 ---
 
+## export-token
+
+Export a browser-created OAuth refresh token to a remote msgvault instance.
+
+Use this for headless deployments (NAS, cloud VM, any remote server) that cannot run a browser flow.
+
+```bash
+msgvault export-token <email> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--to <url>` | Remote msgvault URL (or `MSGVAULT_REMOTE_URL`) |
+| `--api-key <key>` | API key (or `MSGVAULT_REMOTE_API_KEY`) |
+| `--allow-insecure` | Allow HTTP for trusted networks (for example Tailscale) |
+
+`export-token` uploads `~/.msgvault/tokens/<email>.json` to `/api/v1/auth/token/<email>`, saves it in the remote token store, and posts account metadata to `/api/v1/accounts`.
+
+---
+
 ## verify
 
 Verify local archive integrity against Gmail.
@@ -160,7 +183,7 @@ msgvault verify <email> [flags]
 
 | Flag | Description |
 |---|---|
-| `--sample-size N` | Messages to sample (default: 100) |
+| `--sample N` | Messages to sample (default: 100) |
 
 ---
 
@@ -184,7 +207,10 @@ msgvault list-senders [flags]
 
 | Flag | Description |
 |---|---|
-| `--limit N` | Number of results (default: 10) |
+| `-n`, `--limit N` | Number of results (default: 50) |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--json` | Output as JSON |
 
 ---
 
@@ -198,7 +224,10 @@ msgvault list-domains [flags]
 
 | Flag | Description |
 |---|---|
-| `--limit N` | Number of results (default: 10) |
+| `-n`, `--limit N` | Number of results (default: 50) |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--json` | Output as JSON |
 
 ---
 
@@ -207,8 +236,15 @@ msgvault list-domains [flags]
 List all labels with message counts.
 
 ```bash
-msgvault list-labels
+msgvault list-labels [flags]
 ```
+
+| Flag | Description |
+|---|---|
+| `-n`, `--limit N` | Number of results (default: 50) |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--json` | Output as JSON |
 
 ---
 
@@ -261,6 +297,24 @@ msgvault serve
 ```
 
 The `serve` command has no CLI flags. All configuration (port, bind address, API key, CORS, account schedules) is read from your `config.toml`. See [Web Server](/api-server/) for endpoint documentation and [Configuration](/configuration/#server) for config options.
+
+---
+
+## setup
+
+Run the first-run setup wizard for OAuth and optional remote deployment.
+
+```bash
+msgvault setup
+```
+
+If configured for a remote server, this command generates `<MSGVAULT_HOME>/nas-bundle` with:
+
+- `config.toml` ready for container deployment
+- `client_secret.json`
+- `docker-compose.yml`
+
+The wizard also stores remote URL/API key in `remote` config block so `export-token` can use it without extra flags.
 
 ---
 
@@ -352,6 +406,7 @@ msgvault delete-staged [batch-id] [flags]
 | Flag | Description |
 |---|---|
 | `-y`, `--yes` | Skip confirmation prompt |
+| `--trash` | Move to trash instead of permanent delete |
 | `--dry-run` | Show what would be deleted without deleting |
 | `-l`, `--list` | List staged deletion batches |
 | `--account` | Filter to a specific account |
@@ -381,6 +436,16 @@ msgvault update [flags]
 | `--check` | Check for updates without installing |
 | `-y`, `--yes` | Skip confirmation prompt |
 | `-f`, `--force` | Force update even if already on the latest version |
+
+---
+
+## version
+
+Print version, commit, build date, and platform information.
+
+```bash
+msgvault version
+```
 
 ---
 
