@@ -20,6 +20,24 @@ The flow is built on three capabilities:
 5. Run the initial full sync on the remote host
 6. Use the `msgvault` API or CLI in remote mode
 
+## Docker Image
+
+The image is published to GitHub Container Registry:
+
+```bash
+docker pull ghcr.io/wesm/msgvault:latest
+```
+
+| Tag | Description |
+|-----|-------------|
+| `latest` | Latest stable release from main branch |
+| `v1.2.3` | Specific version |
+| `1.2` | Latest patch of minor version |
+| `1` | Latest minor/patch of major version |
+| `sha-abc1234` | Specific commit (for debugging) |
+
+**Architectures:** `linux/amd64` (Intel/AMD NAS, standard servers) and `linux/arm64` (Raspberry Pi 4/5, newer NAS). Docker selects the correct one automatically.
+
 ## 1) Interactive Setup and Bundle Generation
 
 Run the wizard once after installing msgvault:
@@ -114,9 +132,7 @@ Verify the service:
 curl http://remote-host:8080/health
 ```
 
-:::note[NAS-specific paths]
-On Synology, QNAP, and similar NAS devices the Docker volume path varies. For example, Synology typically uses `/volume1/docker/msgvault`.
-:::
+See [Platform Notes](#platform-notes) for Synology, QNAP, and Raspberry Pi-specific paths.
 
 ## 3) Provision Gmail Tokens
 
@@ -176,6 +192,33 @@ curl -X POST -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/sync/yo
 curl -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/scheduler/status
 ```
 
+## 5) Verify Setup
+
+```bash
+# Check token was saved
+docker exec msgvault ls -la /data/tokens/
+
+# Check daemon logs
+docker logs msgvault
+
+# Verify scheduled sync is registered
+curl -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/scheduler/status
+```
+
+After setup, your data directory contains:
+
+```
+/opt/msgvault/          # (or wherever you deployed the bundle)
+├── config.toml           # Server configuration
+├── client_secret.json    # Google OAuth credentials
+├── docker-compose.yml    # Compose service definition
+├── msgvault.db           # SQLite database (created on first run)
+├── tokens/               # OAuth tokens (one per account)
+│   └── you@gmail.com.json
+├── attachments/          # Content-addressed attachment storage
+└── analytics/            # Parquet cache for fast queries
+```
+
 ## Using the Local CLI Against Remote
 
 When your local machine config has:
@@ -190,12 +233,120 @@ allow_insecure = true
 `search`, `stats`, `list-accounts`, and `show-message` automatically query the remote API.
 Use `--local` if you explicitly want to query local SQLite instead.
 
+## Platform Notes
+
+### Synology DSM
+
+1. Install **Container Manager** (Docker) from Package Center
+2. Create a shared folder for data (e.g., `/volume1/docker/msgvault`)
+3. Use Container Manager UI or SSH to run docker-compose
+
+Synology uses ACLs that can override standard Unix permissions. The generated bundle already includes `user: root` in docker-compose.yml to handle this. If you're writing your own Compose file, add `user: root` to the service.
+
+Via SSH:
+
+```bash
+cd /volume1/docker/msgvault
+docker-compose up -d
+```
+
+### QNAP
+
+1. Install **Container Station** from App Center
+2. Create a folder for data (e.g., `/share/Container/msgvault`)
+3. Use Container Station or SSH to run docker-compose
+
+### Raspberry Pi
+
+Works on Pi 4 and Pi 5 with a 64-bit OS:
+
+```bash
+# Verify 64-bit OS
+uname -m  # Should show aarch64
+
+# Standard docker-compose setup
+docker-compose up -d
+```
+
+Initial sync of large mailboxes will be slower on Pi hardware. Use `--limit` to test with a small batch first.
+
 ## Security Notes
 
 - **Use Tailscale.** The recommended way to access your NAS remotely is via [Tailscale](https://tailscale.com/). It encrypts all traffic and avoids the need for TLS certificates, port forwarding, or reverse proxies. Use your Tailscale hostname (e.g., `http://nas.tail12345.ts.net:8080`) with `--allow-insecure`.
 - **API key protects all API access.** The server requires `api_key` for non-loopback addresses. Anyone with the key can read your entire archive, so treat it like a password.
 - **Don't expose port 8080 to the internet.** msgvault is designed for trusted networks. If you need internet access, use Tailscale rather than opening ports on your router.
 - The generated bundle sets `user: root` in Docker Compose, which works around common NAS ACL quirks (for example Synology). On a standard Linux server you can change this to a non-root user.
+
+## Container Management
+
+```bash
+# View logs
+docker logs msgvault
+docker logs -f msgvault  # Follow
+
+# Run msgvault commands inside the container
+docker exec msgvault msgvault stats
+docker exec -it msgvault msgvault tui  # Interactive TUI
+
+# Restart
+docker-compose restart
+
+# Update to latest image
+docker-compose pull
+docker-compose up -d
+
+# Stop
+docker-compose down
+```
+
+### Health Checks
+
+The container includes a health check that polls `/health` every 30 seconds.
+
+```bash
+docker inspect --format='{{.State.Health.Status}}' msgvault
+# Returns: healthy, unhealthy, or starting
+```
+
+### Backups
+
+Back up the data directory regularly:
+
+```bash
+# Stop container for consistent backup
+docker-compose stop
+tar -czf msgvault-backup-$(date +%Y%m%d).tar.gz ./data
+docker-compose start
+```
+
+Critical files:
+- `msgvault.db` — email metadata and bodies
+- `tokens/` — OAuth tokens (re-auth required if lost)
+- `config.toml` — configuration
+- `attachments/` — email attachments (large, optional if you can re-sync)
+
+## Cron Schedule Reference
+
+The `schedule` field in `[[accounts]]` uses standard cron format (5 fields):
+
+```
+┌───────────── minute (0-59)
+│ ┌───────────── hour (0-23)
+│ │ ┌───────────── day of month (1-31)
+│ │ │ ┌───────────── month (1-12)
+│ │ │ │ ┌───────────── day of week (0-6, 0=Sunday)
+│ │ │ │ │
+* * * * *
+```
+
+| Schedule | Description |
+|----------|-------------|
+| `0 2 * * *` | Daily at 2:00 AM |
+| `0 */6 * * *` | Every 6 hours |
+| `*/30 * * * *` | Every 30 minutes |
+| `0 8,18 * * *` | Twice daily at 8 AM and 6 PM |
+| `0 2 * * 0` | Weekly on Sunday at 2 AM |
+| `0 2 1 * *` | Monthly on the 1st at 2 AM |
 
 ## Troubleshooting
 
