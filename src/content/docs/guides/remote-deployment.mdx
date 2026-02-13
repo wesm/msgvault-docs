@@ -17,7 +17,8 @@ The flow is built on three capabilities:
 2. Copy the generated `nas-bundle` directory to your remote host
 3. Run `docker-compose up -d` on the remote host
 4. Add a Gmail account locally and export the token to the remote host
-5. Trigger sync and use the `msgvault` API or CLI in remote mode
+5. Run the initial full sync on the remote host
+6. Use the `msgvault` API or CLI in remote mode
 
 ## 1) Interactive Setup and Bundle Generation
 
@@ -130,19 +131,17 @@ msgvault add-account you@gmail.com
 2. Export the token to the remote endpoint:
 
 ```bash
-msgvault export-token you@gmail.com --to http://remote-host:8080 --api-key YOUR_API_KEY
+# HTTPS (recommended)
+msgvault export-token you@gmail.com --to https://remote-host:8080 --api-key YOUR_API_KEY
+
+# HTTP on trusted LAN (requires --allow-insecure)
+msgvault export-token you@gmail.com --to http://remote-host:8080 --api-key YOUR_API_KEY --allow-insecure
 ```
 
 The command uploads to `POST /api/v1/auth/token/{email}` and also posts to `POST /api/v1/accounts` to register:
 
 - default sync schedule `0 2 * * *`
 - account enabled
-
-If your remote host is on a trusted LAN and you prefer HTTP, use `--allow-insecure`:
-
-```bash
-msgvault export-token you@gmail.com --to http://remote-host:8080 --api-key YOUR_API_KEY --allow-insecure
-```
 
 If you did not configure remote details during setup, you can also set:
 
@@ -152,19 +151,27 @@ export MSGVAULT_REMOTE_API_KEY=YOUR_API_KEY
 msgvault export-token you@gmail.com
 ```
 
-## 4) Start and Sync
+## 4) Run Initial Full Sync
 
-On the remote container, run sync manually after export:
+The scheduler and sync API run **incremental** syncs only, which require a completed full sync to work. Run the initial full sync inside the container:
 
 ```bash
-# one-time trigger
-curl -X POST -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/sync/you@gmail.com
+# Required — scheduled sync will not work without this
+docker exec msgvault msgvault sync-full you@gmail.com
 
-# confirm account schedule/status
-curl -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/scheduler/status
+# Optional: test with a small batch first
+docker exec msgvault msgvault sync-full you@gmail.com --limit 100
 ```
 
-Background sync runs on schedule after the first full archive is created.
+After the full sync completes, scheduled syncs run automatically on the cron schedule registered during token export (`0 2 * * *` by default). You can also trigger a manual sync via the API:
+
+```bash
+# Trigger incremental sync via API (only works after full sync)
+curl -X POST -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/sync/you@gmail.com
+
+# Check schedule status
+curl -H "X-API-Key: YOUR_API_KEY" http://remote-host:8080/api/v1/scheduler/status
+```
 
 ## Using the Local CLI Against Remote
 
@@ -196,6 +203,14 @@ Use `--local` if you explicitly want to query local SQLite instead.
 ### 401/authorization errors from export
 
 Check that `X-API-Key` matches the server's `[server] api_key` and that `/api/v1/auth/token/{email}` is reachable.
+
+### Sync fails with "no history ID" or "run full sync first"
+
+The scheduler and sync API only run incremental syncs. You must run a full sync first:
+
+```bash
+docker exec msgvault msgvault sync-full you@gmail.com
+```
 
 ### Account not syncing after import
 
