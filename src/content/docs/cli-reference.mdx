@@ -10,6 +10,7 @@ description: Complete command reference for all msgvault commands.
 | `--config` | Path to config file (default: `~/.msgvault/config.toml`) |
 | `--home` | Home directory for all data (overrides `MSGVAULT_HOME`) |
 | `-v`, `--verbose` | Verbose output |
+| `--local` | Force local database mode when `[remote]` is configured |
 | `--help` | Show help |
 
 ---
@@ -150,6 +151,26 @@ Accepts internal numeric IDs or Gmail message IDs. See [Exporting Data](/usage/e
 
 ---
 
+## export-token
+
+Export a browser-created OAuth refresh token to a remote msgvault instance.
+
+Use this for headless deployments like NAS containers that cannot run a browser flow.
+
+```bash
+msgvault export-token <email> [flags]
+```
+
+| Flag | Description |
+|---|---|
+| `--to <url>` | Remote msgvault URL (or `MSGVAULT_REMOTE_URL`) |
+| `--api-key <key>` | API key (or `MSGVAULT_REMOTE_API_KEY`) |
+| `--allow-insecure` | Allow HTTP for trusted networks (for example Tailscale) |
+
+`export-token` uploads `~/.msgvault/tokens/<email>.json` to `/api/v1/auth/token/<email>`, saves it in the remote token store, and posts account metadata to `/api/v1/accounts`.
+
+---
+
 ## verify
 
 Verify local archive integrity against Gmail.
@@ -261,6 +282,24 @@ msgvault serve
 ```
 
 The `serve` command has no CLI flags. All configuration (port, bind address, API key, CORS, account schedules) is read from your `config.toml`. See [Web Server](/api-server/) for endpoint documentation and [Configuration](/configuration/#server) for config options.
+
+---
+
+## setup
+
+Run the first-run setup wizard for OAuth and optional remote NAS deployment.
+
+```bash
+msgvault setup
+```
+
+If configured for a remote NAS, this command generates `<MSGVAULT_HOME>/nas-bundle` with:
+
+- `config.toml` ready for container deployment
+- `client_secret.json`
+- `docker-compose.yml`
+
+The wizard also stores remote URL/API key in `remote` config block so `export-token` can use it without extra flags.
 
 ---
 

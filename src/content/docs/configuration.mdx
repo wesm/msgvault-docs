@@ -36,6 +36,13 @@ api_port = 8080
 bind_addr = "127.0.0.1"
 api_key = "your-secret-key"
 
+[remote]
+# Remote msgvault endpoint for CLI remote mode
+url = "https://nas.example.com:8080"
+api_key = "remote-api-key"
+# Set to true only for trusted HTTP-only networks
+allow_insecure = false
+
 # Scheduled sync accounts
 [[accounts]]
 email = "you@gmail.com"
@@ -94,6 +101,18 @@ Settings for the web server started by `msgvault serve`. See [Web Server](/api-s
 | `cors_credentials` | `false` | Allow credentials in CORS requests |
 | `cors_max_age` | `0` | CORS preflight cache duration in seconds |
 
+### `[remote]`
+
+When set, CLI commands read from the remote server by default for supported operations.
+
+| Key | Default | Description |
+|---|---|---|
+| `url` | — | Remote API base URL (e.g. `https://nas.local:8080`) |
+| `api_key` | — | API key used by remote commands |
+| `allow_insecure` | `false` | Allow HTTP remote connections |
+
+Affected CLI commands: `search`, `show-message`, `stats`, `list-accounts`.
+
 ### `[[accounts]]`
 
 Scheduled sync accounts for the web server. Each `[[accounts]]` entry defines a cron schedule for automatic background syncing.
@@ -125,6 +144,8 @@ Both options are equivalent: `config.toml` is loaded from the specified director
 | Variable | Description |
 |---|---|
 | `MSGVAULT_HOME` | Base directory for all data (default: `~/.msgvault`) |
+| `MSGVAULT_REMOTE_URL` | Fallback remote URL for `export-token` when not in config |
+| `MSGVAULT_REMOTE_API_KEY` | Fallback remote API key for `export-token` |
 
 ## File Locations
 
