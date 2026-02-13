@@ -250,12 +250,13 @@ Register or ensure an account is scheduled for sync on the remote server.
 ```json
 {
   "email": "you@gmail.com",
-  "schedule": "0 2 * * *",
-  "enabled": true
+  "schedule": "0 2 * * *"
 }
 ```
 
-If the account already exists:
+The `enabled` field is always set to `true` server-side.
+
+**If the account already exists (200 OK):**
 
 ```json
 {
@@ -264,7 +265,7 @@ If the account already exists:
 }
 ```
 
-On success:
+**On success (201 Created):**
 
 ```json
 {
@@ -284,7 +285,7 @@ Trigger a manual sync for an account. Returns immediately with a 202 status whil
 ```json
 {
   "status": "accepted",
-  "message": "sync started for you@gmail.com"
+  "message": "Sync started for you@gmail.com"
 }
 ```
 
@@ -374,7 +375,7 @@ All server settings go in the `[server]` section of `config.toml`. Account sched
 | `allow_insecure` | `false` | Allow non-loopback binding without `api_key` |
 | `cors_origins` | `[]` | Allowed CORS origins |
 | `cors_credentials` | `false` | Allow credentials in CORS requests |
-| `cors_max_age` | `0` | CORS preflight cache duration in seconds |
+| `cors_max_age` | `0` | CORS preflight cache duration in seconds (defaults to `86400` when `cors_origins` is set) |
 
 ### `[[accounts]]`
 
