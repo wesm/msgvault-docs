@@ -54,6 +54,7 @@ msgvault sync-full [email] [flags]
 | `--limit N` | Maximum messages to download |
 | `--after YYYY-MM-DD` | Only messages after this date |
 | `--before YYYY-MM-DD` | Only messages before this date |
+| `--query` | Gmail search query filter |
 | `--noresume` | Ignore checkpoints, start fresh |
 | `--verbose` | Detailed progress output |
 
@@ -79,6 +80,8 @@ msgvault search <query> [flags]
 
 | Flag | Description |
 |---|---|
+| `-n`, `--limit N` | Maximum number of results (default: 50) |
+| `--offset N` | Skip first N results |
 | `--json` | Output results as JSON |
 
 See [Searching](/usage/searching/) for the full operator reference.
@@ -95,23 +98,22 @@ msgvault tui [flags]
 
 | Flag | Description |
 |---|---|
-| `--account <email>` | Filter to a specific account |
+| `--force-sql` | Force SQLite queries instead of Parquet |
+| `--no-cache-build` | Skip automatic cache build/update |
 
 ---
 
 ## export-eml
 
-Export a message as a `.eml` file.
+Export a message as a `.eml` file. Accepts either a numeric database ID or a Gmail message ID.
 
 ```bash
-msgvault export-eml [flags]
+msgvault export-eml <id> [flags]
 ```
 
 | Flag | Description |
 |---|---|
-| `--message-id N` | Internal database message ID |
-| `--gmail-id <hex>` | Gmail message ID |
-| `--output <path>` | Output file (default: stdout) |
+| `-o`, `--output <path>` | Output file (default: `<gmail_id>.eml`, use `-` for stdout) |
 
 ---
 
@@ -181,7 +183,7 @@ msgvault verify <email> [flags]
 
 | Flag | Description |
 |---|---|
-| `--sample-size N` | Messages to sample (default: 100) |
+| `--sample N` | Messages to sample (default: 100) |
 
 ---
 
@@ -205,7 +207,10 @@ msgvault list-senders [flags]
 
 | Flag | Description |
 |---|---|
-| `--limit N` | Number of results (default: 10) |
+| `-n`, `--limit N` | Number of results (default: 50) |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--json` | Output as JSON |
 
 ---
 
@@ -219,7 +224,10 @@ msgvault list-domains [flags]
 
 | Flag | Description |
 |---|---|
-| `--limit N` | Number of results (default: 10) |
+| `-n`, `--limit N` | Number of results (default: 50) |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--json` | Output as JSON |
 
 ---
 
@@ -228,8 +236,15 @@ msgvault list-domains [flags]
 List all labels with message counts.
 
 ```bash
-msgvault list-labels
+msgvault list-labels [flags]
 ```
+
+| Flag | Description |
+|---|---|
+| `-n`, `--limit N` | Number of results (default: 50) |
+| `--after YYYY-MM-DD` | Only messages after this date |
+| `--before YYYY-MM-DD` | Only messages before this date |
+| `--json` | Output as JSON |
 
 ---
 
@@ -391,6 +406,7 @@ msgvault delete-staged [batch-id] [flags]
 | Flag | Description |
 |---|---|
 | `-y`, `--yes` | Skip confirmation prompt |
+| `--trash` | Move to trash instead of permanent delete |
 | `--dry-run` | Show what would be deleted without deleting |
 | `-l`, `--list` | List staged deletion batches |
 | `--account` | Filter to a specific account |
@@ -420,6 +436,16 @@ msgvault update [flags]
 | `--check` | Check for updates without installing |
 | `-y`, `--yes` | Skip confirmation prompt |
 | `-f`, `--force` | Force update even if already on the latest version |
+
+---
+
+## version
+
+Print version, commit, build date, and platform information.
+
+```bash
+msgvault version
+```
 
 ---
 

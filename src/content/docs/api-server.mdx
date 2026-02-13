@@ -47,7 +47,7 @@ All endpoints except `/health` require authentication when `api_key` is set in y
 | API key header | `X-API-Key: <key>` | `X-API-Key: my-secret` |
 | Plain auth header | `Authorization: <key>` | `Authorization: my-secret` |
 
-If no `api_key` is configured and the server is bound to a loopback address (`127.0.0.1` or `::1`), authentication is not required.
+If no `api_key` is configured, authentication is not required regardless of bind address. The separate `allow_insecure` / security validation prevents starting without an API key on non-loopback addresses.
 
 ## API Endpoints
 
@@ -89,7 +89,7 @@ Paginated message list.
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `page` | int | `1` | Page number |
-| `page_size` | int | `50` | Results per page |
+| `page_size` | int | `20` | Results per page |
 
 **Response:**
 
@@ -97,7 +97,7 @@ Paginated message list.
 {
   "total": 142857,
   "page": 1,
-  "page_size": 50,
+  "page_size": 20,
   "messages": [
     {
       "id": 12345,
@@ -154,7 +154,7 @@ Full-text search using the same query syntax as `msgvault search`.
 |---|---|---|---|
 | `q` | string | (required) | Search query |
 | `page` | int | `1` | Page number |
-| `page_size` | int | `50` | Results per page |
+| `page_size` | int | `20` | Results per page |
 
 **Response:**
 
@@ -163,7 +163,7 @@ Full-text search using the same query syntax as `msgvault search`.
   "query": "quarterly report",
   "total": 23,
   "page": 1,
-  "page_size": 50,
+  "page_size": 20,
   "messages": [
     {
       "id": 12345,
@@ -305,8 +305,7 @@ Scheduler state and per-account schedule details.
       "running": false,
       "last_run": "2024-10-15T08:00:00Z",
       "next_run": "2024-10-15T09:00:00Z",
-      "schedule": "0 * * * *",
-      "last_error": null
+      "schedule": "0 * * * *"
     }
   ]
 }
