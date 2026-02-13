@@ -155,7 +155,7 @@ Accepts internal numeric IDs or Gmail message IDs. See [Exporting Data](/usage/e
 
 Export a browser-created OAuth refresh token to a remote msgvault instance.
 
-Use this for headless deployments like NAS containers that cannot run a browser flow.
+Use this for headless deployments (NAS, cloud VM, any remote server) that cannot run a browser flow.
 
 ```bash
 msgvault export-token <email> [flags]
@@ -287,13 +287,13 @@ The `serve` command has no CLI flags. All configuration (port, bind address, API
 
 ## setup
 
-Run the first-run setup wizard for OAuth and optional remote NAS deployment.
+Run the first-run setup wizard for OAuth and optional remote deployment.
 
 ```bash
 msgvault setup
 ```
 
-If configured for a remote NAS, this command generates `<MSGVAULT_HOME>/nas-bundle` with:
+If configured for a remote server, this command generates `<MSGVAULT_HOME>/nas-bundle` with:
 
 - `config.toml` ready for container deployment
 - `client_secret.json`

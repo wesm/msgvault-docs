@@ -63,13 +63,13 @@ Run `msgvault add-account you@gmail.com --headless` to see detailed instructions
 
 After copying the token, you must run `msgvault add-account you@gmail.com` on the headless server to register the account in the database. This command detects the existing token and registers the account without opening a browser.
 
-## NAS / Remote Deployment Issues
+## Remote Deployment Issues
 
 ### `export-token` says HTTPS is required
 
 `msgvault export-token` enforces HTTPS by default for token upload.
 
-- Use `https://nas-host:8080` when possible.
+- Use `https://remote-host:8080` when possible.
 - If you must use plain HTTP on a trusted network, add `--allow-insecure`.
 - You can persist this behavior in `~/.msgvault/config.toml` via `[remote] allow_insecure = true` when using remote mode.
 
@@ -77,7 +77,7 @@ After copying the token, you must run `msgvault add-account you@gmail.com` on th
 
 1. Verify your remote server has an `api_key` in `[server]`.
 2. Confirm `MSGVAULT_REMOTE_API_KEY` / `--api-key` matches that value.
-3. Ensure the NAS endpoint is reachable from the local machine.
+3. Ensure the remote endpoint is reachable from the local machine.
 
 ### Remote command behaves unexpectedly
 
