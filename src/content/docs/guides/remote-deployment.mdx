@@ -136,11 +136,9 @@ msgvault export-token you@gmail.com \
 ```
 
 :::note[Why `--allow-insecure`?]
-`export-token` requires HTTPS by default to protect OAuth tokens in transit. On a home LAN with a private IP like `192.168.1.50`, HTTPS isn't practical (you can't get a TLS certificate for a private IP). Use `--allow-insecure` when the remote host is on a trusted network.
+`export-token` requires HTTPS by default. Most deployments use Tailscale or a home LAN where HTTP is fine — use `--allow-insecure` in these cases.
 
 If you ran `msgvault setup` and configured a remote server, the wizard already set `allow_insecure = true` in your local config, so `--allow-insecure` is not needed on the command line.
-
-For internet-facing deployments, put msgvault behind a reverse proxy with TLS (see [Security Recommendations](/docker/#https-reverse-proxy)).
 :::
 
 The command uploads to `POST /api/v1/auth/token/{email}` and also posts to `POST /api/v1/accounts` to register:
@@ -194,10 +192,9 @@ Use `--local` if you explicitly want to query local SQLite instead.
 
 ## Security Notes
 
+- **Use Tailscale.** The recommended way to access your NAS remotely is via [Tailscale](https://tailscale.com/). It encrypts all traffic and avoids the need for TLS certificates, port forwarding, or reverse proxies. Use your Tailscale hostname (e.g., `http://nas.tail12345.ts.net:8080`) with `--allow-insecure`.
 - **API key protects all API access.** The server requires `api_key` for non-loopback addresses. Anyone with the key can read your entire archive, so treat it like a password.
-- **HTTP is fine on a trusted LAN.** If your NAS is on a home network behind a router, HTTP with an API key is reasonable. The setup wizard generates HTTP URLs by default.
-- **Use HTTPS for internet-facing deployments.** Put msgvault behind a reverse proxy with TLS (Caddy, nginx, Traefik). See [Security Recommendations](/docker/#https-reverse-proxy).
-- **Tailscale** is a good middle ground — it encrypts traffic without needing certificates. Use your Tailscale hostname with HTTPS, or HTTP with `--allow-insecure`.
+- **Don't expose port 8080 to the internet.** msgvault is designed for trusted networks. If you need internet access, use Tailscale rather than opening ports on your router.
 - The generated bundle sets `user: root` in Docker Compose, which works around common NAS ACL quirks (for example Synology). On a standard Linux server you can change this to a non-root user.
 
 ## Troubleshooting

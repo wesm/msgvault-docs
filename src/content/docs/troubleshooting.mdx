@@ -67,11 +67,18 @@ After copying the token, you must run `msgvault add-account you@gmail.com` on th
 
 ### `export-token` says HTTPS is required
 
-`msgvault export-token` enforces HTTPS by default for token upload.
+`msgvault export-token` enforces HTTPS by default. Most deployments use Tailscale or a home LAN where HTTP is fine — add `--allow-insecure`:
 
-- Use `https://remote-host:8080` when possible.
-- If you must use plain HTTP on a trusted network, add `--allow-insecure`.
-- You can persist this behavior in `~/.msgvault/config.toml` via `[remote] allow_insecure = true` when using remote mode.
+```bash
+msgvault export-token you@gmail.com --to http://nas-ip:8080 --api-key KEY --allow-insecure
+```
+
+To avoid passing the flag every time, run `msgvault setup` with a remote server configured (it sets `allow_insecure = true` in your local config automatically), or add it manually:
+
+```toml
+[remote]
+allow_insecure = true
+```
 
 ### `export-token` returns 401/Forbidden
 

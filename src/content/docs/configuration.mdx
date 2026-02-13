@@ -38,10 +38,9 @@ api_key = "your-secret-key"
 
 [remote]
 # Remote msgvault endpoint for CLI remote mode
-url = "https://remote-host.example.com:8080"
+url = "http://nas-ip:8080"
 api_key = "remote-api-key"
-# Set to true only for trusted HTTP-only networks
-allow_insecure = false
+allow_insecure = true
 
 # Scheduled sync accounts
 [[accounts]]
@@ -107,7 +106,7 @@ When set, CLI commands read from the remote server by default for supported oper
 
 | Key | Default | Description |
 |---|---|---|
-| `url` | — | Remote API base URL (e.g. `https://myserver.local:8080`) |
+| `url` | — | Remote API base URL (e.g. `http://nas-ip:8080`) |
 | `api_key` | — | API key used by remote commands |
 | `allow_insecure` | `false` | Allow HTTP remote connections |
 
