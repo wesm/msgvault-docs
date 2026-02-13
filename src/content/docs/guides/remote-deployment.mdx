@@ -233,6 +233,10 @@ allow_insecure = true
 `search`, `stats`, `list-accounts`, and `show-message` automatically query the remote API.
 Use `--local` if you explicitly want to query local SQLite instead.
 
+:::caution[TUI is local-only]
+The interactive TUI (`msgvault tui`) currently requires a local SQLite database and Parquet analytics cache. Remote TUI support is planned for a future release. For now, SSH into the remote host and run `msgvault tui` there, or use the CLI commands listed above.
+:::
+
 ## Platform Notes
 
 ### Synology DSM
