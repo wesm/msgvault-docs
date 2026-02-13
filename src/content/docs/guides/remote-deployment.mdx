@@ -131,12 +131,17 @@ msgvault add-account you@gmail.com
 2. Export the token to the remote endpoint:
 
 ```bash
-# HTTPS (recommended)
-msgvault export-token you@gmail.com --to https://remote-host:8080 --api-key YOUR_API_KEY
-
-# HTTP on trusted LAN (requires --allow-insecure)
-msgvault export-token you@gmail.com --to http://remote-host:8080 --api-key YOUR_API_KEY --allow-insecure
+msgvault export-token you@gmail.com \
+  --to http://nas-ip:8080 --api-key YOUR_API_KEY --allow-insecure
 ```
+
+:::note[Why `--allow-insecure`?]
+`export-token` requires HTTPS by default to protect OAuth tokens in transit. On a home LAN with a private IP like `192.168.1.50`, HTTPS isn't practical (you can't get a TLS certificate for a private IP). Use `--allow-insecure` when the remote host is on a trusted network.
+
+If you ran `msgvault setup` and configured a remote server, the wizard already set `allow_insecure = true` in your local config, so `--allow-insecure` is not needed on the command line.
+
+For internet-facing deployments, put msgvault behind a reverse proxy with TLS (see [Security Recommendations](/docker/#https-reverse-proxy)).
+:::
 
 The command uploads to `POST /api/v1/auth/token/{email}` and also posts to `POST /api/v1/accounts` to register:
 
@@ -146,9 +151,9 @@ The command uploads to `POST /api/v1/auth/token/{email}` and also posts to `POST
 If you did not configure remote details during setup, you can also set:
 
 ```bash
-export MSGVAULT_REMOTE_URL=https://remote-host:8080
+export MSGVAULT_REMOTE_URL=http://nas-ip:8080
 export MSGVAULT_REMOTE_API_KEY=YOUR_API_KEY
-msgvault export-token you@gmail.com
+msgvault export-token you@gmail.com --allow-insecure
 ```
 
 ## 4) Run Initial Full Sync
@@ -189,9 +194,10 @@ Use `--local` if you explicitly want to query local SQLite instead.
 
 ## Security Notes
 
-- The remote server config still enforces `api_key` for non-loopback API access.
-- `http://` is accepted for `export-token` only when `--allow-insecure` is used.
-- Prefer HTTPS if the endpoint is exposed beyond trusted networks.
+- **API key protects all API access.** The server requires `api_key` for non-loopback addresses. Anyone with the key can read your entire archive, so treat it like a password.
+- **HTTP is fine on a trusted LAN.** If your NAS is on a home network behind a router, HTTP with an API key is reasonable. The setup wizard generates HTTP URLs by default.
+- **Use HTTPS for internet-facing deployments.** Put msgvault behind a reverse proxy with TLS (Caddy, nginx, Traefik). See [Security Recommendations](/docker/#https-reverse-proxy).
+- **Tailscale** is a good middle ground — it encrypts traffic without needing certificates. Use your Tailscale hostname with HTTPS, or HTTP with `--allow-insecure`.
 - The generated bundle sets `user: root` in Docker Compose, which works around common NAS ACL quirks (for example Synology). On a standard Linux server you can change this to a non-root user.
 
 ## Troubleshooting
