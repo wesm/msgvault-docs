@@ -87,6 +87,7 @@ export default defineConfig({
             { label: 'Data Storage', slug: 'architecture/storage' },
           ],
         },
+        { label: 'Changelog', slug: 'changelog' },
         { label: 'Troubleshooting', slug: 'troubleshooting' },
         { label: 'Development', slug: 'development' },
         { label: 'FAQ', slug: 'faq' },

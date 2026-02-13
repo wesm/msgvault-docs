@@ -1,0 +1,153 @@
+---
+title: Changelog
+description: Release history for msgvault
+---
+
+All notable changes to msgvault, grouped by minor release.
+
+## 0.7
+<small>2026-02-08</small>
+
+**New features**
+
+- HTTP API server and daemon mode with scheduled syncs for always-on archiving.
+- Account filters for MCP `search`, `list`, and `aggregate` tools.
+- Hide-deleted message filter and revamped filter modal in the terminal UI.
+- Gmail thread ID support in query results for thread-aware workflows.
+- Nix flake support for reproducible builds.
+
+**Improvements**
+
+- Optimized incremental sync to reduce sync time on existing archives.
+- Hardened cache validation and cache handling for better sync reliability.
+- Improved query/API consistency across backends.
+
+**Bug fixes**
+
+- Fixed CPU pinning that caused high CPU usage during batch deletion.
+- Fixed batch deletion terminal UI workflow issues.
+
+---
+
+## 0.6
+<small>2026-02-07</small>
+
+**New features**
+
+- Secure file permissions with Windows DACL support for safer archives.
+- Windows update support with `.zip` archives and `.exe` binaries.
+- `--home` CLI flag to set the base directory for archives.
+- FTS5 full-text search index built during sync, with automatic backfill for existing databases.
+
+**Improvements**
+
+- Improved Windows update pipeline reliability and testability.
+- Added Discord community links and security review automation.
+
+**Bug fixes**
+
+- Fixed TUI search and navigation issues (pagination, scrolling, stats, zero-result handling).
+- Fixed silent error handling in encoding repair.
+- Fixed a command-injection risk when launching the OAuth browser.
+- Fixed Windows TOML parsing error hints for backslashes.
+- Preserved cursor position when scrolling page up/down in the message list.
+- Strip surrounding quotes from CLI paths in Windows CMD.
+- Fixed invalid UTF-8 handling during sync to prevent failures.
+
+---
+
+## 0.5
+<small>2026-02-04</small>
+
+**New features**
+
+- `export-attachment` and `export-attachments` CLI commands for exporting message attachments.
+- Windows support with installer, config path fixes, and `--config` flag.
+- MCP attachment support with embedded resources and `export_attachment` tool.
+
+**Improvements**
+
+- Updated account management CLI with new add/list/update commands and options.
+- Improved Windows installer, removed sqlite_scanner dependency, CI updates, and test reliability improvements.
+
+**Bug fixes**
+
+- Fixed cache consistency after deletions.
+- Fixed incremental export losing junction table data.
+- Fixed SQL injection vulnerability in query handling.
+- Fixed MIME date parsing issues.
+- Fixed path traversal risk in attachment export, including symlink traversal.
+- Fixed non-functional `sync-full` limit argument.
+- Fixed DuckDB type handling errors.
+- Prevented crash when rethrowing panics during export.
+- Added missing bounds checks in MCP handlers to prevent invalid access.
+
+---
+
+## 0.4
+<small>2026-02-03</small>
+
+**New features**
+
+- `--list` flag on `delete-staged` to preview staged deletions.
+
+**Improvements**
+
+- Replaced broken `--headless` device flow with clearer setup instructions.
+
+---
+
+## 0.3
+<small>2026-02-02</small>
+
+**New features**
+
+- `sync` and `sync-full` run without arguments to sync all accounts.
+
+**Improvements**
+
+- Tightened private file permissions to `600` for better local data security.
+- Improved deletion progress experience and recovery behavior.
+
+**Bug fixes**
+
+- Fixed deletion issues around scope escalation and checkpoint recovery.
+- Fixed missing `rows.Err()` handling when batching participants.
+- Fixed broken links in the README.
+
+---
+
+## 0.2
+<small>2026-02-02</small>
+
+**New features**
+
+- MCP server for chat integration, replacing the built-in chat command.
+
+**Improvements**
+
+- Reduced memory use during string joins for better performance.
+- Made test suite more reliable with shared fixtures and deterministic timing.
+
+---
+
+## 0.1
+<small>2026-02-02</small>
+
+**New features**
+
+- Initial release with full Gmail sync, search, TUI, and MCP server.
+- Incremental sync via Gmail History API (renamed from `sync-incremental` to `sync`).
+- Helpful OAuth setup instructions when `client_secrets` is missing.
+
+**Improvements**
+
+- Improved Linux compatibility by building against Ubuntu 20.04 (glibc 2.31).
+- Full version tag shown in TUI title bar.
+
+**Bug fixes**
+
+- Fixed TUI update notification and ensured release builds show commit/date info.
+- Fixed bad substitution in Linux container builds.
+- Fixed incorrect elapsed time reporting during sync.
+- Fixed RecipientName filters to include BCC recipients.
