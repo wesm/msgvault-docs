@@ -3,7 +3,7 @@ title: MCP Server
 description: Expose your email archive to AI assistants via MCP.
 ---
 
-The MCP server operates on your **local, read-only archive**, not your live Gmail account. The AI cannot send emails, modify labels, delete messages, or access your Google credentials. You control when data enters the archive (via `sync-full` / `sync`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface.
+The MCP server operates on your **local archive**, not your live Gmail account. The AI cannot send emails, modify labels, or access your Google credentials. It can search, read, and analyze your messages, and it can stage messages for deletion, but nothing is actually deleted until you explicitly run `msgvault delete-staged` from the command line. You control when data enters the archive (via `sync-full` / `sync`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface.
 
 ## Setup
 
@@ -42,6 +42,31 @@ The MCP server exposes the following tools to connected AI clients:
 | `export_attachment` | Save attachment to filesystem | `attachment_id` (int), `destination` (string) |
 | `get_stats` | Archive overview statistics | — |
 | `aggregate` | Grouped statistics (top senders, domains, labels, time series) | `group_by` (string: sender/recipient/domain/label/time), `limit` (int), `after` (string), `before` (string), `account` (string) |
+| `stage_deletion` | Stage messages for deletion by query or structured filters | `query` (string), `from` (string), `domain` (string), `label` (string), `after` (string), `before` (string), `has_attachment` (bool), `account` (string) |
+
+## Deletion Staging
+
+The `stage_deletion` tool lets you ask an AI assistant to find and stage messages for deletion. It supports two modes:
+
+- **Query mode**: pass a Gmail-style search string (for example `from:linkedin subject:job alert`)
+- **Structured filters**: pass individual filter fields (`from`, `domain`, `label`, `after`, `before`, `has_attachment`)
+
+You must use one mode or the other, not both in the same call. Results are capped at 100,000 messages per call.
+
+Staging creates a deletion manifest but does not delete anything. To execute, review and run from the CLI:
+
+```bash
+# List pending deletion batches
+msgvault delete-staged --list
+
+# Execute a batch
+msgvault delete-staged
+
+# Cancel a batch
+msgvault cancel-deletion <batch-id>
+```
+
+See [Deleting Email](/usage/deletion/) for the full deletion workflow.
 
 ## Example Usage with Claude
 
@@ -51,6 +76,8 @@ Once configured, you can ask Claude questions like:
 - *"How many emails did I receive last month?"*
 - *"Show me the top 10 senders in my archive"*
 - *"Find all messages with attachments larger than 5MB"*
+- *"Stage all emails from linkedin.com for deletion"*
+- *"Stage promotional emails from before 2023 for deletion"*
 
 Claude will automatically call the appropriate msgvault tools to retrieve and analyze your messages.
 
