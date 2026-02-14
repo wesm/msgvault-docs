@@ -21,7 +21,16 @@ For finer control, drill into any group and use `Space` to select individual row
 
 <Screenshot src="/tui-selection.svg" alt="msgvault TUI with rows selected for deletion staging" />
 
-## Staging Steps
+## Staging via MCP
+
+If you have the [MCP server](/usage/chat/) configured, you can ask an AI assistant to stage messages for deletion using natural language:
+
+- *"Stage all emails from linkedin.com for deletion"*
+- *"Stage promotional emails from before 2023 for deletion"*
+
+The AI uses the `stage_deletion` tool to create a deletion manifest. Nothing is deleted until you explicitly run `msgvault delete-staged` from the CLI.
+
+## Staging Steps (TUI)
 
 1. Launch the TUI: `msgvault tui`
 2. Navigate to the view and group you want to clean up
