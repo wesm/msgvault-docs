@@ -25,6 +25,18 @@ Verify the installation:
 msgvault --help
 ```
 
+## Conda-Forge
+
+If you use [conda](https://docs.conda.io/) or [pixi](https://pixi.sh/):
+
+```bash
+# Using pixi (recommended)
+pixi global install msgvault
+
+# Using conda
+conda install -c conda-forge msgvault
+```
+
 ## Build From Source
 
 Requires Go 1.25+ and a C/C++ compiler (GCC or Clang). CGO is required because msgvault uses `mattn/go-sqlite3` (SQLite with FTS5) and `go-duckdb` (Parquet analytics), both of which compile native extensions.

@@ -68,6 +68,49 @@ msgvault sync [email]
 
 ---
 
+## import-mbox
+
+Import a local MBOX archive into msgvault.
+
+```bash
+msgvault import-mbox <identifier> <export-file>
+```
+
+The export file may be a plain `.mbox`/`.mbx` file or a `.zip` containing one or more MBOX files.
+
+| Flag | Default | Description |
+|---|---|---|
+| `--source-type` | `mbox` | Source type recorded in database (e.g., `hey` for HEY.com) |
+| `--label` | — | Label to apply to all imported messages |
+| `--no-resume` | `false` | Start fresh, ignoring interrupted progress |
+| `--checkpoint-interval` | `200` | Save progress every N messages |
+| `--no-attachments` | `false` | Skip writing attachments to disk |
+
+See [Importing Local Email](/usage/importing/) for usage examples.
+
+---
+
+## import-emlx
+
+Import Apple Mail `.emlx` files into msgvault.
+
+```bash
+msgvault import-emlx <identifier> <mail-dir>
+```
+
+The mail directory should be an Apple Mail mailbox tree containing `.mbox` or `.imapmbox` directories, each with a `Messages/` subdirectory of `.emlx` files. You can also point directly at a single `.mbox` directory. Labels are derived from directory names.
+
+| Flag | Default | Description |
+|---|---|---|
+| `--source-type` | `apple-mail` | Source type recorded in database |
+| `--no-resume` | `false` | Start fresh, ignoring interrupted progress |
+| `--checkpoint-interval` | `200` | Save progress every N messages |
+| `--no-attachments` | `false` | Skip writing attachments to disk |
+
+See [Importing Local Email](/usage/importing/) for usage examples.
+
+---
+
 ## search
 
 Search the archive with Gmail-like query syntax.

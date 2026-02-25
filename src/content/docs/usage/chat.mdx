@@ -3,7 +3,7 @@ title: MCP Server
 description: Expose your email archive to AI assistants via MCP.
 ---
 
-The MCP server operates on your **local, read-only archive**, not your live Gmail account. The AI cannot send emails, modify labels, delete messages, or access your Google credentials. You control when data enters the archive (via `sync-full` / `sync`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface.
+The MCP server operates on your **local archive**, not your live Gmail account. The AI cannot send emails, modify labels, or access your Google credentials. Read and search operations work entirely offline against your local database. The one write operation, `stage_deletion`, only creates a local manifest file; actual deletion still requires you to run `msgvault delete-staged` from the CLI. You control when data enters the archive (via `sync-full` / `sync` / `import-mbox` / `import-emlx`) and when anything is deleted (via the explicit [deletion workflow](/usage/deletion/)). Compared to giving an AI assistant direct OAuth access to your mailbox, this is a fundamentally smaller attack surface.
 
 ## Setup
 
@@ -42,6 +42,7 @@ The MCP server exposes the following tools to connected AI clients:
 | `export_attachment` | Save attachment to filesystem | `attachment_id` (int), `destination` (string) |
 | `get_stats` | Archive overview statistics | — |
 | `aggregate` | Grouped statistics (top senders, domains, labels, time series) | `group_by` (string: sender/recipient/domain/label/time), `limit` (int), `after` (string), `before` (string), `account` (string) |
+| `stage_deletion` | Stage messages for deletion (creates manifest only) | `query` (string) OR structured filters: `from` (string), `domain` (string), `label` (string), `after` (string), `before` (string), `has_attachment` (bool); optional: `account` (string) |
 
 ## Example Usage with Claude
 
@@ -51,8 +52,26 @@ Once configured, you can ask Claude questions like:
 - *"How many emails did I receive last month?"*
 - *"Show me the top 10 senders in my archive"*
 - *"Find all messages with attachments larger than 5MB"*
+- *"Stage all messages from linkedin.com for deletion"*
 
 Claude will automatically call the appropriate msgvault tools to retrieve and analyze your messages.
+
+## Staged Deletion via MCP
+
+The `stage_deletion` tool lets an AI assistant help you clean up your inbox. It accepts either a Gmail-style query string or structured filters (sender, domain, label, date range), but not both at once.
+
+When called, `stage_deletion` creates a local deletion manifest, a JSON file listing the matched messages. It does **not** delete anything. To execute the deletion, you must run `msgvault delete-staged` from the CLI. See [Deleting Email](/usage/deletion/) for the full workflow.
+
+The tool returns the batch ID, message count, and next steps:
+
+```json
+{
+  "batch_id": "20260224-095132-from-linkedin",
+  "message_count": 150,
+  "status": "pending",
+  "next_step": "Run 'msgvault delete-staged' to execute deletion"
+}
+```
 
 ## CLI Flags
 

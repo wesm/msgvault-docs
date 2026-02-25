@@ -18,7 +18,7 @@ description: Common questions about msgvault, Gmail API safety, and what the too
 
 <p class="faq-question">Is it safe to use with AI agents (MCP, Claude, etc.)?</p>
 
-For normal use, yes. The MCP server exposes only read and search operations (no sync, no deletion, no sending). An AI agent operating through the MCP server can only read and search your local archive, which is the intended use case.
+For normal use, yes. The MCP server exposes read, search, and deletion-staging operations (no sync, no sending, no direct deletion). An AI agent operating through the MCP server can read and search your local archive, and can stage messages for deletion by creating a local manifest file. Staged deletions are not executed until you explicitly run `msgvault delete-staged` from the CLI.
 
 However, you should be aware of prompt injection risks. If an adversary can influence the prompts your LLM processes (through malicious email content, for example), the agent could be manipulated into reading sensitive messages such as password reset links or two-factor codes. In a worst case scenario, this could allow an attacker to compromise accounts by combining prompt injection with the ability to read your inbox.
 
@@ -34,7 +34,7 @@ Everything stays on your local machine. msgvault stores messages in a SQLite dat
 
 <p class="faq-question">Can I use msgvault with non-Gmail accounts?</p>
 
-Not yet. msgvault currently supports Gmail only. Support for other providers via IMAP and MBOX import is being considered for future releases.
+Yes. While Gmail sync is the primary data source, you can import email from any provider using `import-mbox` (standard MBOX archives) or `import-emlx` (Apple Mail exports). Most email providers offer an MBOX export option. Imported messages are stored in the same database and work with all the same tools: search, TUI, MCP server, web server, and export. See [Importing Local Email](/usage/importing/) for details. IMAP support is planned for a future release.
 
 <p class="faq-question">Does deleting email in msgvault delete it from Gmail?</p>
 
