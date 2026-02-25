@@ -3,7 +3,7 @@ title: Architecture Overview
 description: Package structure and data flow.
 ---
 
-msgvault syncs your Gmail to a local SQLite database, the only step that touches the network. Everything else (search, analytics, the TUI, and the MCP server) runs entirely offline against SQLite, Parquet, and local attachment files.
+msgvault syncs your Gmail to a local SQLite database, the only step that touches the network. You can also import local MBOX archives and Apple Mail exports. Everything else (search, analytics, the TUI, and the MCP server) runs entirely offline against SQLite, Parquet, and local attachment files.
 
 <img src="/how-it-works.svg" alt="msgvault architecture: Gmail API syncs to SQLite, then offline Parquet analytics, FTS5 search, TUI, and MCP Server" style="width: 100%; max-width: 960px; margin: 1.5rem auto; display: block;" />
 
@@ -20,6 +20,9 @@ msgvault/
 │   ├── deletion/            # Deletion staging and manifest
 │   ├── gmail/               # Gmail API client
 │   ├── sync/                # Sync orchestration
+│   ├── importer/            # MBOX and EMLX import logic
+│   ├── mbox/                # MBOX format parser
+│   ├── emlx/                # Apple Mail .emlx parser
 │   ├── oauth/               # OAuth2 flows (browser + device)
 │   └── mime/                # MIME parsing
 ├── go.mod
@@ -33,6 +36,9 @@ msgvault/
 | `cmd/` | Cobra CLI commands, config loading |
 | `internal/store` | SQLite database operations, schema management |
 | `internal/sync` | Sync orchestration, MIME parsing, checkpoint management |
+| `internal/importer` | MBOX and EMLX import orchestration, message ingestion |
+| `internal/mbox` | MBOX format reader (mboxo/mboxrd) |
+| `internal/emlx` | Apple Mail .emlx parser and mailbox discovery |
 | `internal/gmail` | Gmail API client with token bucket rate limiting |
 | `internal/oauth` | OAuth2 browser and device authorization flows |
 | `internal/query` | DuckDB engine over Parquet files, SQLite fallback |

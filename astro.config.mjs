@@ -66,6 +66,7 @@ export default defineConfig({
           label: 'CLI Usage',
           items: [
             { label: 'Searching', slug: 'usage/searching' },
+            { label: 'Importing Local Email', slug: 'usage/importing' },
             { label: 'Exporting Data', slug: 'usage/exporting' },
             { label: 'Analytics & Stats', slug: 'usage/analytics' },
             { label: 'Deleting Email', slug: 'usage/deletion' },

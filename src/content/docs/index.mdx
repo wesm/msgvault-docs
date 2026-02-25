@@ -1,6 +1,6 @@
 ---
 title: msgvault
-description: Offline Gmail archive with full-text search, interactive TUI, and multi-account support.
+description: Offline email archive with full-text search, interactive TUI, and multi-account support. Import from Gmail, MBOX, and Apple Mail.
 template: doc
 hero:
   image:
@@ -22,7 +22,7 @@ hero:
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-Currently supports Gmail, with IMAP support and MBOX import coming soon. WhatsApp and other messaging platforms are also planned.
+Supports Gmail sync, MBOX import, and Apple Mail import. IMAP support is coming soon. WhatsApp and other messaging platforms are also planned.
 
 Read the [Introduction](/introduction/) to learn more about why this project was created.
 
@@ -69,8 +69,11 @@ Years of PDFs, photos, documents, and spreadsheets buried in your inbox become o
   <Card title="Web Server" icon="setting">
     REST API for programmatic access to your archive. Optional cron-based background sync scheduling. Build dashboards, automations, and integrations.
   </Card>
+  <Card title="Local Import" icon="open-book">
+    Import MBOX archives and Apple Mail `.emlx` exports from any email provider. Messages are deduplicated, fully indexed, and searchable alongside your Gmail data.
+  </Card>
   <Card title="Safe Deletion" icon="warning">
-    Stage messages for deletion in the TUI, review manifests, then permanently delete from Gmail.
+    Stage messages for deletion in the TUI or via AI assistant, review manifests, then permanently delete from Gmail.
   </Card>
 </CardGrid>
 

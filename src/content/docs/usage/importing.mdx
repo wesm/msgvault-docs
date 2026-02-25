@@ -1,0 +1,169 @@
+---
+title: Importing Local Email
+description: Import MBOX archives and Apple Mail exports into msgvault.
+---
+
+msgvault can import email from local files, not just Gmail. This lets you archive messages from any email provider that supports MBOX export, or import directly from Apple Mail's on-disk storage.
+
+Imported messages are stored in the same database as Gmail messages. You can search, browse, export, and analyze them with all the same tools (TUI, CLI, MCP server, web server). Labels, threading, attachments, and full-text search all work the same way.
+
+## import-mbox
+
+Import a standard [MBOX](https://en.wikipedia.org/wiki/Mbox) file or a `.zip` archive containing one or more MBOX files.
+
+```bash
+msgvault import-mbox <identifier> <export-file>
+```
+
+The identifier is the email address associated with the export (e.g., `you@example.com`). It does not need to be a Gmail address.
+
+### Examples
+
+```bash
+# Import a single MBOX file
+msgvault import-mbox you@example.com /path/to/export.mbox
+
+# Import a zip containing multiple MBOX files
+msgvault import-mbox you@example.com /path/to/export.zip
+
+# HEY.com export (uses MBOX format internally)
+msgvault import-mbox you@hey.com hey-export.zip --source-type hey --label hey
+```
+
+### Flags
+
+| Flag | Default | Description |
+|---|---|---|
+| `--source-type` | `mbox` | Source type recorded in the database (e.g., `hey` for HEY.com exports) |
+| `--label` | — | Label to apply to all imported messages |
+| `--no-resume` | `false` | Start fresh instead of resuming an interrupted import |
+| `--checkpoint-interval` | `200` | Save progress every N messages |
+| `--no-attachments` | `false` | Skip writing attachments to disk (messages still record attachment metadata) |
+
+### Where to get MBOX files
+
+Most email providers offer an MBOX export option:
+
+- **Google Takeout**: Export your Gmail data as MBOX files at [takeout.google.com](https://takeout.google.com)
+- **HEY.com**: Export from Settings, downloads as a `.zip` of MBOX files
+- **Thunderbird**: Use the ImportExportTools NG add-on to export folders as MBOX
+- **Fastmail, ProtonMail, Yahoo**: Check your provider's export/download settings
+
+### Supported formats
+
+The importer accepts:
+
+- Plain `.mbox` or `.mbx` files (standard mboxo/mboxrd format)
+- `.zip` archives containing one or more `.mbox` or `.mbx` files
+
+ZIP archives are extracted to a cache directory and reused on subsequent runs, so re-importing the same zip does not re-extract.
+
+## import-emlx
+
+Import Apple Mail `.emlx` files from a Mail directory tree.
+
+```bash
+msgvault import-emlx <identifier> <mail-dir>
+```
+
+The mail directory should be an Apple Mail mailbox tree containing `.mbox` or `.imapmbox` directories, each with a `Messages/` subdirectory of `.emlx` files. You can also point directly at a single `.mbox` directory.
+
+### Examples
+
+```bash
+# Import an entire Apple Mail directory tree
+msgvault import-emlx me@gmail.com ~/Downloads/mail-2009/Mail/
+
+# Import a single mailbox
+msgvault import-emlx me@gmail.com ~/Mail/INBOX.mbox/
+```
+
+### Flags
+
+| Flag | Default | Description |
+|---|---|---|
+| `--source-type` | `apple-mail` | Source type recorded in the database |
+| `--no-resume` | `false` | Start fresh instead of resuming an interrupted import |
+| `--checkpoint-interval` | `200` | Save progress every N messages |
+| `--no-attachments` | `false` | Skip writing attachments to disk (messages still record attachment metadata) |
+
+### How Apple Mail organizes files
+
+Apple Mail stores each message as an individual `.emlx` file inside a directory hierarchy:
+
+```
+~/Mail/
+├── INBOX.mbox/
+│   └── Messages/
+│       ├── 1.emlx
+│       ├── 2.emlx
+│       └── ...
+├── Sent.mbox/
+│   └── Messages/
+│       └── ...
+├── IMAP-user@gmail.com/
+│   ├── INBOX.imapmbox/
+│   │   └── Messages/
+│   └── [Gmail]/All Mail.imapmbox/
+│       └── Messages/
+└── Mailboxes/
+    └── Projects/
+        └── Work.mbox/
+            └── Messages/
+```
+
+The importer discovers all `.mbox` and `.imapmbox` directories automatically. Labels are derived from directory names: `Mailboxes/Projects/Work.mbox` becomes the label `Projects/Work`, and `INBOX.imapmbox` becomes `INBOX`.
+
+### Where to find Apple Mail files
+
+Apple Mail stores its data at `~/Library/Mail/` on macOS. You can also use a Time Machine backup or a copy of the Mail directory from another machine.
+
+:::caution
+The `.partial.emlx` files that Apple Mail creates for incomplete downloads are automatically skipped during import.
+:::
+
+## Deduplication
+
+Both importers deduplicate messages by SHA-256 hash of the raw MIME content. Running the same import twice produces no duplicates. If the same message appears in multiple MBOX files or Apple Mail mailboxes, it is stored once and given labels from each location.
+
+## Resumable Imports
+
+Imports are resumable by default. If an import is interrupted (Ctrl+C, power loss, error), run the same command again and it picks up from the last checkpoint. Use `--no-resume` to discard progress and start fresh.
+
+During import, a progress summary is printed on completion:
+
+```
+Import complete.
+  Imported:           /path/to/export.mbox
+  Processed:      1234 messages
+  Added:          1200 messages
+  Updated:          30 messages
+  Skipped (dup):     4 messages
+  Errors:            0
+  Bytes:          45.67 MB
+```
+
+## Error Handling
+
+Individual messages that fail to parse are logged and skipped; the import continues. Raw MIME bytes are preserved even for messages that cannot be fully parsed, so no data is lost. Attachment storage errors are also non-fatal.
+
+## After Importing
+
+Imported messages are immediately available for search, TUI browsing, and MCP queries. To update the Parquet analytics cache (used by the TUI for fast aggregation), run:
+
+```bash
+msgvault build-cache
+```
+
+Then explore your imported messages:
+
+```bash
+# Search imported messages
+msgvault search from:alice@example.com
+
+# Launch the TUI
+msgvault tui
+
+# View updated stats
+msgvault stats
+```
